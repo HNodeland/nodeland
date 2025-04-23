@@ -1,1 +1,4 @@
-node_modules/\n.env\n/dist\n/build
+server/.env
+node_modules
+dist
+build
