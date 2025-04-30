@@ -205,8 +205,11 @@ export default function App() {
               <a href="https://www.flaticon.com/free-icons/radio" className="text-xs hover:text-brand-xlight">
                 Radio icons by Freepik
               </a>
-              <a href="https://www.flaticon.com/free-icons/wish" title="wish icons">
+              <a href="https://www.flaticon.com/free-icons/wish" className="text-xs hover:text-brand-xlight">
                 Wish icons created by piksart - Flaticon
+              </a>
+              <a href="https://www.flaticon.com/free-icons/letter-n" className="text-xs hover:text-brand-xlight">
+                Letter n icons created by Kian Bonanno - Flaticon
               </a>
             </nav>
           </div>
