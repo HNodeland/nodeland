@@ -5,6 +5,11 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
+// Import your images from the src/assets folder
+import spotifqrIcon from './assets/wave-sound.png';
+import weatherIcon  from './assets/weather.png';
+import linklyIcon   from './assets/computer.png';
+
 export default function App() {
   const [user, setUser] = useState(undefined);
 
@@ -22,7 +27,7 @@ export default function App() {
         
         {/* HERO */}
         <header className="relative py-24 flex flex-col items-center text-center">
-          {/* Profile or Log In button top-right */}
+          {/* Profile or Log In button */}
           {user ? (
             <Link
               to="/profile"
@@ -49,7 +54,7 @@ export default function App() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <a
-              href="https://github.com/yourusername"
+              href="https://github.com/HNodeland"
               target="_blank"
               rel="noopener noreferrer"
               className="flex-grow sm:flex-none px-6 py-3 bg-brand-accent text-brand-dark font-medium rounded-md transition hover:bg-brand-light text-center"
@@ -57,7 +62,7 @@ export default function App() {
               Here is my GitHub
             </a>
             <a
-              href="mailto:youremail@example.com"
+              href="mailto:haakon@nodeland.no"
               className="flex-grow sm:flex-none px-6 py-3 border-2 border-brand-light text-brand-light font-medium rounded-md transition hover:bg-brand-light hover:text-brand-dark text-center"
             >
               Send me an Email
@@ -75,42 +80,39 @@ export default function App() {
             {/* Card 1: Spotify QR Generator */}
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
               <img
-                src="/assets/icon-spotify-qr.svg"
+                src={spotifqrIcon}
                 alt="SpotifQR"
                 className="h-12 w-12 mx-auto mb-4"
               />
-              <h3 className="text-xl font-semibold mb-2">SpotifQR</h3>
+              <h3 className="text-xl font-semibold mb-2">Spotify QR</h3>
               <p className="text-brand-light">
-                Generate Spotify QR codes on the fly for “Blinding Lights” (2019) by
-                The Weeknd.
+                Generate your own Hister cards.
               </p>
             </div>
 
             {/* Card 2: Harestua Weather */}
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
               <img
-                src="/assets/icon-weather.svg"
+                src={weatherIcon}
                 alt="Harestua Weather"
                 className="h-12 w-12 mx-auto mb-4"
               />
               <h3 className="text-xl font-semibold mb-2">Harestua Weather</h3>
               <p className="text-brand-light">
-                View today’s temperature, conditions, and forecast for Harestua,
-                Norway.
+                View today’s temperature, conditions, and forecast for Harestua, Norway.
               </p>
             </div>
 
             {/* Card 3: Linkly URL Shortener */}
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
               <img
-                src="/assets/icon-url.svg"
+                src={linklyIcon}
                 alt="Linkly URL Shortener"
                 className="h-12 w-12 mx-auto mb-4"
               />
               <h3 className="text-xl font-semibold mb-2">Linkly</h3>
               <p className="text-brand-light">
-                Shorten any URL quickly with customizable slugs and view click
-                analytics in real time.
+                Shorten any URL quickly with customizable slugs and view click analytics in real time.
               </p>
             </div>
 
@@ -121,74 +123,88 @@ export default function App() {
         <section id="about" className="py-12 px-6 text-center md:text-left mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">About Nodeland</h2>
           <p className="text-brand-light mb-4">
-            Built by developers, for developers. Nodeland makes deploying and
-            managing Node.js applications effortless—so you can focus on code,
-            not servers.
+            I am Data Science student at the University of Stavanger. I am also a part-time developer for Ocean IMR.
           </p>
           <p className="text-brand-light">
-            Trusted by startups and enterprises worldwide, our platform
-            delivers rock-solid performance and reliability for your
-            mission-critical apps.
+            This page will be used to display of my programing and development capabilities.
           </p>
         </section>
 
-        {/* TESTIMONIALS */}
-        <section
-          id="testimonials"
-          className="bg-brand-deep py-12 px-6 rounded-lg shadow-inner mb-12"
-        >
-          <h2 className="text-3xl font-bold mb-8 text-center">Trusted by</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 items-center">
-            <img
-              src="/assets/logo-client1.png"
-              alt="Client 1"
-              className="mx-auto h-12"
-            />
-            <img
-              src="/assets/logo-client2.png"
-              alt="Client 2"
-              className="mx-auto h-12"
-            />
-            <img
-              src="/assets/logo-client3.png"
-              alt="Client 3"
-              className="mx-auto h-12"
-            />
-            <img
-              src="/assets/logo-client4.png"
-              alt="Client 4"
-              className="mx-auto h-12"
-            />
+        {/* COURSES */}
+        <section id="courses" className="bg-brand-deep py-12 px-6 rounded-lg shadow-inner mb-12">
+          <h2 className="text-3xl font-bold mb-8 text-center">My thesis along with important courses i have completed at UiS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">Bachelor Thesis</h3>
+              <p className="text-brand-light">
+                Positioning of vehicles and pedestrians in tunnels using Bluetooth beacons and mobile phones.
+              </p>
+            </div>
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">DAT200 – Algorithms & Data Structures</h3>
+              <p className="text-brand-light">
+                Implementation and analysis of core algorithms and data structures for efficient problem-solving.
+              </p>
+            </div>
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">DAT320 – Operating Systems & System Programming</h3>
+              <p className="text-brand-light">
+                Study of OS architectures, concurrency, memory management, and low-level system programming.
+              </p>
+            </div>
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">DAT230/240 – Communication Technology 1 & 2</h3>
+              <p className="text-brand-light">
+                Fundamentals of network communication, protocols, and data transmission methods.
+              </p>
+            </div>
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">DAT240 – Advanced Programming</h3>
+              <p className="text-brand-light">
+                Exploration of advanced programming paradigms, design patterns, and best practices.
+              </p>
+            </div>
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">DAT535 – Data-Intensive Systems & Engineering</h3>
+              <p className="text-brand-light">
+                Design and implementation of scalable, fault-tolerant data pipelines and storage solutions.
+              </p>
+            </div>
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">DAT600 – Algorithm Theory</h3>
+              <p className="text-brand-light">
+                In-depth study of computational complexity, proof techniques, and algorithmic theory.
+              </p>
+            </div>
+            <div className="p-6 bg-brand-mid rounded-lg shadow-md">
+              <h3 className="text-xl font-semibold mb-2">ELE520 – Machine Learning</h3>
+              <p className="text-brand-light">
+                Principles and applications of supervised and unsupervised learning algorithms.
+              </p>
+            </div>
           </div>
         </section>
 
         {/* FOOTER */}
-        <footer className="py-12 px-6 bg-brand-dark">
-          <div className="flex flex-col md:flex-row items-center justify-between mb-8">
-            <div className="mb-6 md:mb-0 text-center md:text-left">
-              <h4 className="text-lg font-semibold mb-2">Stay Updated</h4>
-              <p className="text-brand-light">
-                Join our newsletter for the latest releases.
-              </p>
-            </div>
-            <form action="#" className="flex w-full md:w-auto">
-              <input
-                type="email"
-                placeholder="you@example.com"
-                className="flex-grow px-4 py-2 rounded-l-md focus:outline-none text-brand-dark"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-brand-accent hover:bg-brand-light rounded-r-md transition"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-          <div className="border-t border-brand-mid pt-6 text-center text-brand-light text-sm">
-            &copy; 2025 Nodeland. All rights reserved.
+        <footer className="bg-brand-dark text-brand-light">
+          <div className="container mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between">
+            {/* Copyright */}
+            <p className="text-sm">&copy; 2025 Nodeland. All rights reserved.</p>
+            {/* Attribution Links */}
+            <nav className="flex space-x-4 mt-4 md:mt-0">
+              <a href="https://www.flaticon.com/free-icons/rain" className="text-xs hover:text-brand-xlight">
+                Rain icons by Freepik
+              </a>
+              <a href="https://www.flaticon.com/free-icons/radio" className="text-xs hover:text-brand-xlight">
+                Radio icons by Freepik
+              </a>
+              <a href="https://www.flaticon.com/free-icons/computer" className="text-xs hover:text-brand-xlight">
+                Computer icons by Freepik
+              </a>
+            </nav>
           </div>
         </footer>
+
       </div>
     </div>
   );
