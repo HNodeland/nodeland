@@ -114,10 +114,10 @@ export default function App() {
         <section id="about" className="py-12 px-6 text-center md:text-left mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">About Nodeland</h2>
           <p className="text-brand-light mb-4">
-            I am Data Science student at the University of Stavanger. I am also a part-time developer for Ocean IMR.
+            Håkon Nodeland is a Data Science student at the University of Stavanger. He is also a part-time developer for Ocean IMR.
           </p>
           <p className="text-brand-light">
-            This page will be used to display of my programing and development capabilities.
+            This page will be used to display my programing, design and development capabilities.
           </p>
         </section>
 
@@ -125,7 +125,7 @@ export default function App() {
         <section id="stack" className="py-12 px-6 text-center md:text-left mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Tech Stack</h2>
           <p className="text-brand-light mb-6">
-            Nodeland is powered by a modern JavaScript stack: React with React Router and Axios for dynamic, API-driven UI; Tailwind CSS and Vite for rapid, highly optimized front‑end builds; Node.js with Express for the server; MySQL for persistent data storage; and Passport.js (Google OAuth) for secure authentication.
+            Nodeland.no is powered by a modern JavaScript stack: React with React Router and Axios for dynamic, API-driven UI; Tailwind CSS and Vite for rapid, highly optimized front‑end builds; Node.js with Express for the server; MySQL for persistent data storage; and Passport.js (Google OAuth) for secure authentication.
           </p>
 
           <div className="bg-brand-deep p-6 rounded-lg">
