@@ -1,5 +1,3 @@
-// client/src/App.jsx
-
 import './index.css'; // loads Tailwind CSS and your global styles
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -9,6 +7,7 @@ import { Link } from 'react-router-dom';
 import spotifqrIcon from './assets/wave-sound.png';
 import weatherIcon  from './assets/weather.png';
 import linklyIcon   from './assets/computer.png';
+import stackNoBg    from './assets/stack-no-bg.png';
 
 export default function App() {
   const [user, setUser] = useState(undefined);
@@ -27,7 +26,6 @@ export default function App() {
         
         {/* HERO */}
         <header className="relative py-24 flex flex-col items-center text-center">
-          {/* Profile or Log In button */}
           {user ? (
             <Link
               to="/profile"
@@ -76,8 +74,6 @@ export default function App() {
           className="bg-brand-deep py-12 px-6 rounded-lg shadow-inner mb-12"
         >
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            
-            {/* Card 1: Spotify QR Generator */}
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
               <img
                 src={spotifqrIcon}
@@ -86,11 +82,9 @@ export default function App() {
               />
               <h3 className="text-xl font-semibold mb-2">Spotify QR</h3>
               <p className="text-brand-light">
-                Generate your own Hister cards.
+                Generate your own Hitster cards.
               </p>
             </div>
-
-            {/* Card 2: Harestua Weather */}
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
               <img
                 src={weatherIcon}
@@ -102,8 +96,6 @@ export default function App() {
                 View today’s temperature, conditions, and forecast for Harestua, Norway.
               </p>
             </div>
-
-            {/* Card 3: Linkly URL Shortener */}
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
               <img
                 src={linklyIcon}
@@ -115,7 +107,6 @@ export default function App() {
                 Shorten any URL quickly with customizable slugs and view click analytics in real time.
               </p>
             </div>
-
           </div>
         </section>
 
@@ -128,6 +119,24 @@ export default function App() {
           <p className="text-brand-light">
             This page will be used to display of my programing and development capabilities.
           </p>
+        </section>
+
+        {/* TECH STACK */}
+        <section id="stack" className="py-12 px-6 text-center md:text-left mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Tech Stack</h2>
+          <p className="text-brand-light mb-6">
+            Nodeland is powered by a modern JavaScript stack: React with React Router and Axios for dynamic, API-driven UI; Tailwind CSS and Vite for rapid, highly optimized front‑end builds; Node.js with Express for the server; MySQL for persistent data storage; and Passport.js (Google OAuth) for secure authentication.
+          </p>
+
+          <div className="bg-brand-deep p-6 rounded-lg">
+            <div className="bg-white p-6 rounded-lg">
+              <img
+                src={stackNoBg}
+                alt="Tech stack illustration"
+                className="mx-auto max-w-full h-auto"
+              />
+            </div>
+          </div>
         </section>
 
         {/* COURSES */}
@@ -188,9 +197,7 @@ export default function App() {
         {/* FOOTER */}
         <footer className="bg-brand-dark text-brand-light">
           <div className="container mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between">
-            {/* Copyright */}
-            <p className="text-sm">&copy; 2025 Nodeland. All rights reserved.</p>
-            {/* Attribution Links */}
+            <p className="text-sm">© 2025 Nodeland. All rights reserved.</p>
             <nav className="flex space-x-4 mt-4 md:mt-0">
               <a href="https://www.flaticon.com/free-icons/rain" className="text-xs hover:text-brand-xlight">
                 Rain icons by Freepik
