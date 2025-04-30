@@ -1,26 +1,28 @@
-// src/App.jsx
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import axios from 'axios'
+// client/src/App.jsx
+
+import './App.css';      // ← ensure your custom component styles (and Tailwind classes) get pulled in
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function App() {
-  const [user, setUser] = useState(undefined)
+  const [user, setUser] = useState(undefined);
 
   useEffect(() => {
     axios.get('/api/auth/user', { withCredentials: true })
       .then(res => {
-        setUser(res.data.user)
+        setUser(res.data.user);
         if (res.data.user) {
-          localStorage.setItem('user', JSON.stringify(res.data.user))
+          localStorage.setItem('user', JSON.stringify(res.data.user));
         }
       })
       .catch(() => {
-        setUser(null)
-        localStorage.removeItem('user')
-      })
-  }, [])
+        setUser(null);
+        localStorage.removeItem('user');
+      });
+  }, []);
 
-  if (user === undefined) return <p>Loading…</p>
+  if (user === undefined) return <p>Loading…</p>;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
@@ -30,9 +32,9 @@ export default function App() {
           <div className="mt-4 flex space-x-4">
             <button
               onClick={async () => {
-                await axios.post('/api/auth/logout', {}, { withCredentials: true })
-                setUser(null)
-                localStorage.removeItem('user')
+                await axios.post('/api/auth/logout', {}, { withCredentials: true });
+                setUser(null);
+                localStorage.removeItem('user');
               }}
               className="px-4 py-2 bg-red-500 text-white rounded"
             >
@@ -45,6 +47,9 @@ export default function App() {
               View Profile
             </Link>
           </div>
+          <div className="bg-red-500 p-4 text-white">
+            🔥 Tailwind is finally working!
+          </div>
         </>
       ) : (
         <button
@@ -55,5 +60,5 @@ export default function App() {
         </button>
       )}
     </div>
-  )
+  );
 }
