@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 // Import your images from the src/assets folder
 import spotifqrIcon from './assets/wave-sound.png';
 import weatherIcon  from './assets/weather.png';
-import linklyIcon   from './assets/computer.png';
+import wishListIcon   from './assets/add-to-favorites.png';
 import stackNoBg    from './assets/stack-no-bg.png';
 
 export default function App() {
@@ -98,13 +98,13 @@ export default function App() {
             </div>
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
               <img
-                src={linklyIcon}
+                src={wishListIcon}
                 alt="Linkly URL Shortener"
                 className="h-12 w-12 mx-auto mb-4"
               />
               <h3 className="text-xl font-semibold mb-2">Wish list</h3>
               <p className="text-brand-light">
-                Create your own wish list and share it with others. Others can see what others will buy, but you will not.
+                Create your own wish list and share it with others. Others can see what others will buy, but you can not.
               </p>
             </div>
           </div>
