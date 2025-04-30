@@ -93,7 +93,7 @@ export default function App() {
               />
               <h3 className="text-xl font-semibold mb-2">Harestua Weather</h3>
               <p className="text-brand-light">
-                View today’s temperature, conditions, and forecast for Harestua, Norway.
+                View today's temperature, conditions, and forecast for Harestua, Norway.
               </p>
             </div>
             <div className="p-6 bg-brand-mid rounded-lg shadow-md">
@@ -102,9 +102,9 @@ export default function App() {
                 alt="Linkly URL Shortener"
                 className="h-12 w-12 mx-auto mb-4"
               />
-              <h3 className="text-xl font-semibold mb-2">Linkly</h3>
+              <h3 className="text-xl font-semibold mb-2">Wish list</h3>
               <p className="text-brand-light">
-                Shorten any URL quickly with customizable slugs and view click analytics in real time.
+                Create your own wish list and share it with others. Others can see what others will buy, but you will not.
               </p>
             </div>
           </div>
@@ -205,8 +205,8 @@ export default function App() {
               <a href="https://www.flaticon.com/free-icons/radio" className="text-xs hover:text-brand-xlight">
                 Radio icons by Freepik
               </a>
-              <a href="https://www.flaticon.com/free-icons/computer" className="text-xs hover:text-brand-xlight">
-                Computer icons by Freepik
+              <a href="https://www.flaticon.com/free-icons/wish" title="wish icons">
+                Wish icons created by piksart - Flaticon
               </a>
             </nav>
           </div>
