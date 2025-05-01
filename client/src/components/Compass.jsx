@@ -1,15 +1,19 @@
 // client/src/components/Compass.jsx
 import React, { useEffect, useState } from 'react'
 import { useMotionValue, useSpring } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 export default function Compass({ direction = 0 }) {
-  const outerR    = 45
+  const { t } = useTranslation()
+
+  // outerR was 32.5; now 37.5 (+5px radius => +10px diameter)
+  const outerR    = 37.5
   const tickInner = outerR - 5
   const tickOuter = outerR
-  const centerR   = 9          // radius of the inner circle
+  const centerR   = 9
   const arrowLen  = outerR - centerR - 4
 
-  // Generate ticks every 30°
+  // ticks every 30°
   const ticks = []
   for (let deg = 0; deg < 360; deg += 30) {
     const rad = (deg * Math.PI) / 180
@@ -22,7 +26,7 @@ export default function Compass({ direction = 0 }) {
     })
   }
 
-  // Cardinal labels
+  // cardinal labels
   const labels = [
     { text: 'N', angle:   0 },
     { text: 'E', angle:  90 },
@@ -39,31 +43,36 @@ export default function Compass({ direction = 0 }) {
     }
   })
 
-  //— Animate the direction with a spring
+  // animate
   const dirMV     = useMotionValue(direction)
   const dirSpring = useSpring(dirMV, { stiffness: 120, damping: 25 })
   const [disp, setDisp] = useState(direction)
 
-  // on prop change kick off a spring
   useEffect(() => { dirMV.set(direction) }, [direction, dirMV])
-  // subscribe to the spring and update our local state
   useEffect(() => {
-    const unsubscribe = dirSpring.on('change', v => setDisp(v))
-    return unsubscribe
+    const unsub = dirSpring.on('change', v => setDisp(v))
+    return unsub
   }, [dirSpring])
 
-  // compute animated arrow endpoint
+  // arrow endpoint
   const radDir    = (disp * Math.PI) / 180
   const arrowEndX = 50 + arrowLen * Math.sin(radDir)
   const arrowEndY = 50 - arrowLen * Math.cos(radDir)
 
   return (
     <div className="bg-brand-deep p-4 rounded-lg shadow-md w-full max-h-[300px]">
-      <svg viewBox="-10 -10 120 120" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-        {/* Outer circle */}
+      <h4 className="text-center text-lg font-semibold mb-2 text-white">
+        {t('windDirection')}
+      </h4>
+      <svg
+        viewBox="-10 -10 120 120"
+        preserveAspectRatio="xMidYMid meet"
+        className="w-full h-full relative -top-[10px]"
+      >
+        {/* outer circle */}
         <circle cx="50" cy="50" r={outerR} stroke="#888" fill="none" strokeWidth="2" />
 
-        {/* Ticks */}
+        {/* ticks */}
         {ticks.map(t => (
           <line
             key={t.key}
@@ -74,7 +83,7 @@ export default function Compass({ direction = 0 }) {
           />
         ))}
 
-        {/* Cardinal labels */}
+        {/* labels */}
         {labels.map(l => (
           <text
             key={l.key}
@@ -88,38 +97,33 @@ export default function Compass({ direction = 0 }) {
           </text>
         ))}
 
-        {/* Arrow marker */}
+        {/* arrow marker */}
         <defs>
           <marker id="arrow" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto">
             <path d="M0,0 L0,6 L6,3 z" fill="#F58383" />
           </marker>
         </defs>
 
-        {/* Animated wind-direction arrow */}
+        {/* moving arrow */}
         <line
-          x1="50"
-          y1="50"
-          x2={arrowEndX}
-          y2={arrowEndY}
+          x1="50" y1="50"
+          x2={arrowEndX} y2={arrowEndY}
           stroke="#F58383"
           strokeWidth="3"
           markerEnd="url(#arrow)"
         />
 
-        {/* Center background circle */}
+        {/* center */}
         <circle
-          cx="50"
-          cy="50"
-          r={centerR}
+          cx="50" cy="50" r={centerR}
           fill="#162433"
           stroke="#fff"
           strokeWidth="1.5"
         />
 
-        {/* Animated center degree text */}
+        {/* degree text */}
         <text
-          x="50"
-          y="52"
+          x="50" y="52"
           fill="#fff"
           fontSize="6"
           fontWeight="bold"

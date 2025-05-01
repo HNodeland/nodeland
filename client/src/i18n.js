@@ -1,3 +1,4 @@
+// client/src/i18n.js
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -28,6 +29,9 @@ const resources = {
           desc: 'Create your own wish list and share it with others.'
         }
       },
+
+      // Compass header
+      windDirection: 'Wind Direction',
 
       // About
       aboutTitle: 'About the Author',
@@ -118,6 +122,9 @@ const resources = {
         }
       },
 
+      // Compass header
+      windDirection: 'Vindretning',
+
       // About
       aboutTitle: 'Om forfatteren',
       aboutLine1: 'Håkon Nodeland er data science-student ved Universitetet i Stavanger. Han jobber også deltid som utvikler for Ocean IMR.',
@@ -167,8 +174,8 @@ const resources = {
       // Profile / Settings
       loadingProfile: 'Laster profil…',
       mustLogIn: 'Du må være logget inn for å se denne siden.',
-      username: 'Navn',
       backHome: 'Tilbake',
+      username: 'Navn',
       logout: 'Logg ut',
       darkMode: 'Mørk modus',
       language: 'Språk',

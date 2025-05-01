@@ -1,4 +1,5 @@
-# docker-compose.dev.yml
+version: '3.8'
+
 services:
   db:
     image: mysql:8.0
@@ -12,7 +13,6 @@ services:
     volumes:
       - db-data:/var/lib/mysql
       - ./server/init.sql:/docker-entrypoint-initdb.d/init.sql
-    # <— changed host port to 3307 to avoid conflict with local MySQL
     ports:
       - "3307:3306"
     healthcheck:
@@ -26,13 +26,13 @@ services:
       context: ./server
       dockerfile: Dockerfile
     container_name: nodeland-backend
-    command: npm run dev
+    command: npm run dev                # nodemon watches and reloads your server
     working_dir: /app
     env_file:
       - ./server/.env
     volumes:
-      - ./server:/app
-      - /app/node_modules
+      - ./server:/app                   # mount your server source
+      - /app/node_modules               # keep dependencies in container
     ports:
       - "4000:4000"
     depends_on:
@@ -40,18 +40,17 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+    image: node:18-alpine               # use Node for Vite dev server
     container_name: nodeland-frontend
     working_dir: /app
+    command: sh -c "npm install && npm run dev"
     volumes:
-      - ./client:/app
-      - /app/node_modules
+      - ./client:/app                   # mount your client source
+      - /app/node_modules               # keep deps in container
     ports:
-      - "5173:80"
+      - "5173:5173"
     environment:
-      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"       # ensure file‐watching works in Docker
     depends_on:
       - backend
 
