@@ -33,6 +33,21 @@ const resources = {
       // Compass header
       windDirection: 'Wind Direction',
 
+      // Temperature Gauge
+      temperatureGauge: {
+        title: 'Temperature Scale (°C)',
+        stats: {
+          low: "Today's Low",
+          current: 'Current',
+          high: "Today's High",
+        },
+        feels: {
+          low: 'Felt like',
+          current: 'Feels like',
+          high: 'Felt like',
+        }
+      },
+
       // About
       aboutTitle: 'About the Author',
       aboutLine1: 'Håkon Nodeland is a Data Science student at the University of Stavanger. He is also a part-time developer for Ocean IMR.',
@@ -124,6 +139,21 @@ const resources = {
 
       // Compass header
       windDirection: 'Vindretning',
+
+      //Temperatur
+      temperatureGauge: {
+        title: 'Temperaturskala (°C)',
+        stats: {
+          low: 'Dagens laveste',
+          current: 'Aktuell',
+          high: 'Dagens høyeste',
+        },
+        feels: {
+          low: 'Føltes som',
+          current: 'Føles som',
+          high: 'Føltes som',
+        }
+      },
 
       // About
       aboutTitle: 'Om forfatteren',

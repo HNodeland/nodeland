@@ -28,16 +28,55 @@ Some time in the future, i am planning to use this site as a CV. I will upload a
 ---
 
 
-## Setup & Configuration
+# Setup & Configuration
 
-Now uses Docker!
 
-To run the site
+## Development Mode
 
-`docker compose -f docker-compose.dev.yml up --build -d`
+We provide a `docker-compose.dev.yml` to run the entire stack with hot-reload:
 
-To close the site
-`docker compose -f docker-compose.dev.yml down -v`
+### Start the site
+
+    # First time or after changing Dockerfiles / dependencies:
+    docker compose -f docker-compose.dev.yml up --build -d
+
+This will:
+
+- Launch a MySQL container (`nodeland-db`) with the initial schema  
+- Launch the backend (`nodeland-backend`) using `npm run dev` (nodemon)  
+- Launch the frontend (`nodeland-frontend`) using Vite’s dev server with HMR  
+
+### Stop the site
+
+    docker compose -f docker-compose.dev.yml down
+
+### Rebuild a single service
+
+If you add or remove NPM packages, rebuild only that service:
+
+    # Rebuild & restart the backend
+    docker compose -f docker-compose.dev.yml up -d --build backend
+
+    # Rebuild & restart the frontend
+    docker compose -f docker-compose.dev.yml up -d --build frontend
+
+### Viewing Logs & Restarting Services
+
+    # Tail backend logs
+    docker compose -f docker-compose.dev.yml logs -f backend
+
+    # Restart only the frontend
+    docker compose -f docker-compose.dev.yml restart frontend
+
+
+Once running in development mode, simply edit your code locally:
+
+- **Backend**: nodemon will auto-reload on file changes  
+- **Frontend**: Vite HMR will update your browser instantly  
+
+No need to tear down and rebuild the entire stack on every code change!  
+
+---
 
 1. **Prerequisites**  
    - Node.js v16+ & npm v8+  

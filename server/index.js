@@ -142,7 +142,7 @@ async function pollWeather() {
 }
 
 pollWeather()
-setInterval(pollWeather, 2_000)
+setInterval(pollWeather, 2000)
 
 app.get('/api/weather/history', (_req, res) => {
   res.json({
@@ -150,6 +150,23 @@ app.get('/api/weather/history', (_req, res) => {
     tempHistory:     weatherHistory.map(h => ({ time: h.time, temp:     h.temp     })),
     pressureHistory: weatherHistory.map(h => ({ time: h.time, pressure: h.pressure })),
     rainHistory:     weatherHistory.map(h => ({ time: h.time, rain:     h.rain     })),
+  })
+})
+
+// — Temperature stats endpoint —
+
+app.get('/api/weather/stats', (_req, res) => {
+  const temps = weatherHistory.map(h => h.temp).filter(t => typeof t === 'number')
+  if (temps.length === 0) {
+    return res.json({ high: null, low: null, current: null })
+  }
+  const high = Math.max(...temps)
+  const low   = Math.min(...temps)
+  const current = temps[temps.length - 1]
+  res.json({
+    high:    Number(high.toFixed(1)),
+    low:     Number(low.toFixed(1)),
+    current: Number(current.toFixed(1)),
   })
 })
 
