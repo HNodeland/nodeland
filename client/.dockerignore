@@ -1,0 +1,4 @@
+# Ignore node_modules and build output in your client context
+node_modules
+dist
+npm-debug.log*

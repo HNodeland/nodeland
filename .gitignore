@@ -22,5 +22,28 @@ dist-ssr
 *.sln
 *.sw?
 
+# Node modules
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build outputs
+client/dist/
+server/build/
+
+# Environment files
+*.env
+!*.env.example
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# IDEs, OS files
+.vscode/
+.DS_Store
+
 /server/.env
+
+
 prompt.txt

@@ -30,6 +30,15 @@ Some time in the future, i am planning to use this site as a CV. I will upload a
 
 ## Setup & Configuration
 
+Now uses Docker!
+
+To run the site
+
+`docker compose -f docker-compose.dev.yml up --build -d`
+
+To close the site
+`docker compose -f docker-compose.dev.yml down -v`
+
 1. **Prerequisites**  
    - Node.js v16+ & npm v8+  
    - MySQL v5.7+  
