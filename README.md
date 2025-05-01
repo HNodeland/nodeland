@@ -11,9 +11,14 @@ I want to genereate 2-sided cards with a spotify url/qr code on one side and the
 
 
 ### Harestua Weather
-As of right now, nodeland.no is used to display weather data gathered by a weather station. It is pretty outdated, and it is in dire need of an upgrade. This is a good time to try to learn some cool front-end tricks. This is how nodeland.no is looking right now:
+As of right now, [nodeland.no](www.nodeland.no) is used to display weather data gathered by a weather station. It is pretty outdated, and it is in dire need of an upgrade. This is a good time to try to learn some cool front-end tricks. This is how [nodeland.no](www.nodeland.no) looking right now:
 
 ![nodeland-old](./docs/nodeland-old.png)
+
+
+And this is how far i've gotten in the development of the upgrade:
+![nodeland-new](./docs/weather-app.png)
+2 of the components are completed, both are fetching data from the weather station at [nodeland.no/clientraw.txt](www.nodeland.no/clientraw.txt)
 
 ### Wish list
 The 3rd project is something my girlfriend and I discussed. We wanted an app where we could create a wish list, typically for weddings or large events, and then share it with others. The ones we shared the wish list with could then log in and check off something from the list. When others are checking out the wish list, they will be able to see who is going to get what. When the creators are checking out the wish-list however, they will not be able to see this. 
