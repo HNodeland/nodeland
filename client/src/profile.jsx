@@ -1,11 +1,12 @@
-// client/src/profile.jsx
-
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import i18n from './i18n';
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
+  const { t } = useTranslation();
+  const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -19,29 +20,43 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await axios.post('/api/auth/logout', {}, { withCredentials: true });
-      setUser(null);
-      navigate('/'); // redirect home after logout
+      localStorage.removeItem('user');
+      navigate('/');
     } catch (err) {
       console.error('Logout failed', err);
     }
   };
 
-  if (loading) {
-    return (
-      <p className="text-center mt-20 text-brand-light">Loading profile…</p>
-    );
-  }
+  const changeLanguage = async e => {
+    const lng = e.target.value;
+    try {
+      await axios.patch(
+        '/api/profile/language',
+        { language: lng },
+        { withCredentials: true }
+      );
+      // apply immediately
+      i18n.changeLanguage(lng);
+      setUser(u => ({ ...u, language: lng }));
+      localStorage.setItem('user', JSON.stringify({ ...user, language: lng }));
+    } catch (err) {
+      console.error('Language update failed', err);
+    }
+  };
 
+  if (loading) {
+    return <p className="text-center mt-20 text-brand-light">{t('loadingProfile')}</p>;
+  }
   if (!user) {
     return (
       <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4 md:px-8 lg:px-16">
         <div className="bg-brand-deep rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
-          <p className="text-red-500 mb-4">You must be logged in to view this page.</p>
+          <p className="text-red-500 mb-4">{t('mustLogIn')}</p>
           <Link
             to="/"
             className="inline-block px-4 py-2 bg-brand-accent hover:bg-brand-light text-brand-dark rounded-md transition"
           >
-            &larr; Back to Home
+            &larr; {t('backHome')}
           </Link>
         </div>
       </div>
@@ -52,57 +67,57 @@ export default function Profile() {
     <div className="min-h-screen bg-brand-dark text-white flex flex-col">
       <div className="container mx-auto px-6 flex-grow flex items-center justify-center">
         <div className="bg-brand-deep rounded-lg shadow-lg p-8 max-w-md w-full space-y-8">
+
           {/* Profile Header */}
           <div className="text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-2">Your Profile</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">{t('profile')}</h2>
             <p><span className="font-semibold">ID:</span> {user.id}</p>
-            <p><span className="font-semibold">Name:</span> {user.displayName}</p>
+            <p><span className="font-semibold">{t('username')}:</span> {user.displayName}</p>
           </div>
 
           {/* Settings Menu */}
           <div className="space-y-6">
+
             {/* Dark Mode Toggle */}
             <div className="flex items-center justify-between">
-              <span className="font-medium">Dark Mode</span>
-              <button
-                className="px-4 py-2 bg-brand-accent hover:bg-brand-light text-brand-dark rounded-md transition"
-              >
+              <span className="font-medium">{t('darkMode')}</span>
+              <button className="px-4 py-2 bg-brand-accent hover:bg-brand-light text-brand-dark rounded-md transition">
                 Toggle
               </button>
             </div>
 
             {/* Language Selector */}
             <div className="flex items-center justify-between">
-              <span className="font-medium">Language</span>
+              <span className="font-medium">{t('language')}</span>
               <select
                 className="px-4 py-2 bg-brand-mid text-brand-light rounded-md focus:outline-none"
+                value={user.language}
+                onChange={changeLanguage}
               >
-                <option>English</option>
-                <option>Español</option>
-                <option>Français</option>
+                <option value="en">English</option>
+                <option value="no">Norsk</option>
               </select>
             </div>
 
-            {/* Notifications Placeholder */}
+            {/* Notifications */}
             <div className="flex items-center justify-between">
-              <span className="font-medium">Notifications</span>
-              <button
-                className="px-4 py-2 border-2 border-brand-light rounded-md hover:bg-brand-light hover:text-brand-dark transition"
-              >
+              <span className="font-medium">{t('notifications')}</span>
+              <button className="px-4 py-2 border-2 border-brand-light rounded-md hover:bg-brand-light hover:text-brand-dark transition">
                 Toggle
               </button>
             </div>
 
             {/* Logout Button */}
             <div className="flex items-center justify-between">
-              <span className="font-medium">Log Out</span>
+              <span className="font-medium">{t('logout')}</span>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition"
               >
-                Log Out
+                {t('logout')}
               </button>
             </div>
+
           </div>
 
           {/* Back to Home */}
@@ -111,7 +126,7 @@ export default function Profile() {
               to="/"
               className="inline-block px-4 py-2 bg-brand-accent hover:bg-brand-light text-brand-dark rounded-md transition"
             >
-              &larr; Back to Home
+              &larr; {t('backHome')}
             </Link>
           </div>
         </div>
