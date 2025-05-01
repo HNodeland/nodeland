@@ -3,18 +3,18 @@
 # 1) Build stage
 FROM node:18-alpine AS build
 WORKDIR /app
+
+# Copy only package manifests, install deps
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
+
+# Copy the rest of your app and build
 COPY . .
 RUN npm run build
 
-# 2) Runtime stage
+# 2) Serve with nginx
 FROM nginx:alpine
-
-# Copy *your* nginx.conf over the default
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy the built files
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 80

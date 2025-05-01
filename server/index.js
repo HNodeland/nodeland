@@ -1,4 +1,3 @@
-// server/index.js
 import 'dotenv/config'
 import express from 'express'
 import session from 'express-session'
@@ -8,6 +7,7 @@ import mysql from 'mysql2/promise'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import axios from 'axios'
 import { ensureAuth } from './auth.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -25,15 +25,13 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-  },
+  cookie: { httpOnly: true, secure: false, sameSite: 'lax' },
 }))
 
 app.use(passport.initialize())
 app.use(passport.session())
+
+// — Google OAuth Setup —
 
 passport.serializeUser((user, done) => done(null, user))
 passport.deserializeUser((obj, done) => done(null, obj))
@@ -55,7 +53,6 @@ passport.use(new GoogleStrategy({
            email       = VALUES(email)`,
         [id, displayName, email]
       )
-
       const [rows] = await app.locals.db.execute(
         `SELECT language FROM users WHERE id = ?`,
         [id]
@@ -68,8 +65,6 @@ passport.use(new GoogleStrategy({
     }
   }
 ))
-
-// ─── Authentication Routes ───────────────────────────────────────────────────
 
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
@@ -98,7 +93,7 @@ app.get('/api/profile', ensureAuth, (req, res) => {
 
 app.patch('/api/profile/language', ensureAuth, async (req, res) => {
   const { language } = req.body
-  if (!['en', 'no'].includes(language)) {
+  if (!['en','no'].includes(language)) {
     return res.status(400).json({ error: 'Invalid language' })
   }
   try {
@@ -114,9 +109,63 @@ app.patch('/api/profile/language', ensureAuth, async (req, res) => {
   }
 })
 
+// — Health check —
+
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK' })
 })
+
+// — Weather history polling & endpoint —
+
+const weatherHistory = []
+
+async function pollWeather() {
+  try {
+    const res = await axios.get(process.env.RAW_URL || 'https://nodeland.no/clientraw.txt')
+    const parts = res.data.trim().split(/\s+/)
+    const now = new Date()
+    weatherHistory.push({
+      ts:       now.getTime(),
+      time:     now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
+      wind:     parseFloat(parts[1]),
+      temp:     parseFloat(parts[4]),
+      pressure: parseFloat(parts[6]),
+      rain:     parseFloat(parts[8]),
+    })
+    const cutoff = Date.now() - 24*60*60*1000
+    while (weatherHistory.length && weatherHistory[0].ts < cutoff) {
+      weatherHistory.shift()
+    }
+  } catch (err) {
+    console.error('pollWeather error:', err.message)
+  }
+}
+
+pollWeather()
+setInterval(pollWeather, 2_000)
+
+app.get('/api/weather/history', (_req, res) => {
+  res.json({
+    windHistory:     weatherHistory.map(h => ({ time: h.time, wind:     h.wind     })),
+    tempHistory:     weatherHistory.map(h => ({ time: h.time, temp:     h.temp     })),
+    pressureHistory: weatherHistory.map(h => ({ time: h.time, pressure: h.pressure })),
+    rainHistory:     weatherHistory.map(h => ({ time: h.time, rain:     h.rain     })),
+  })
+})
+
+// — Proxy raw text endpoint —
+
+app.get('/api/weather/raw', async (_req, res) => {
+  try {
+    const upstream = await axios.get('https://nodeland.no/clientraw.txt')
+    res.type('text/plain').send(upstream.data)
+  } catch (err) {
+    console.error('Error proxying raw weather data:', err.message)
+    res.status(502).json({ error: 'Unable to fetch raw weather data' })
+  }
+})
+
+// — Static serve & SPA fallback —
 
 if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../client/dist')
@@ -126,6 +175,8 @@ if (process.env.NODE_ENV === 'production') {
   })
 }
 
+// — Bootstrap DB & start listening —
+
 ;(async () => {
   try {
     app.locals.db = await mysql.createPool({
@@ -134,7 +185,6 @@ if (process.env.NODE_ENV === 'production') {
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
     })
-
     const port = process.env.PORT || 4000
     app.listen(port, () =>
       console.log(`Backend listening on http://localhost:${port}`)

@@ -1,36 +1,44 @@
 #!/usr/bin/env python3
+"""
+Recursively writes the name and contents of every file under specified directories,
+skipping any file or directory whose name is in SKIP_NAMES or that cannot be decoded as UTF-8.
+"""
+import os
 from pathlib import Path
 
 # Names of files or directories to skip entirely
 SKIP_NAMES = {"node_modules", "package-lock.json"}
 
-def write_files_in_dir(base_dir: Path, out_file, recurse_into=()):
+
+def write_files_in_dir(base_dir: Path, out_file):
     """
-    Writes the name and contents of every file directly in `base_dir`,
-    plus (optionally) files in any subdirectories listed in recurse_into.
-    Always skips any name in SKIP_NAMES.
+    Recursively writes the name and contents of every text file under base_dir,
+    skipping any file or directory named in SKIP_NAMES or binary files.
     """
     if not base_dir.exists():
         return
 
-    for item in sorted(base_dir.iterdir()):
-        # skip anything named in SKIP_NAMES
-        if item.name in SKIP_NAMES:
-            continue
+    for root, dirs, files in os.walk(base_dir):
+        # Filter out directories to skip
+        dirs[:] = [d for d in dirs if d not in SKIP_NAMES]
 
-        # if it's a file, write it
-        if item.is_file():
-            out_file.write(f"=== {item.relative_to(script_dir)} ===\n")
-            out_file.write(item.read_text(encoding="utf-8") + "\n\n")
+        for fname in sorted(files):
+            # Skip any blacklisted name
+            if fname in SKIP_NAMES:
+                continue
 
-        # if it's an allowed subfolder, recurse one level down
-        elif item.is_dir() and item.name in recurse_into:
-            for sub in sorted(item.iterdir()):
-                if sub.name in SKIP_NAMES:
-                    continue
-                if sub.is_file():
-                    out_file.write(f"=== {sub.relative_to(script_dir)} ===\n")
-                    out_file.write(sub.read_text(encoding="utf-8") + "\n\n")
+            file_path = Path(root) / fname
+            rel_path = file_path.relative_to(script_dir)
+
+            # Attempt to read as UTF-8 text, skip if binary or decode error
+            try:
+                content = file_path.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, PermissionError):
+                continue
+
+            out_file.write(f"=== {rel_path} ===\n")
+            out_file.write(content + "\n\n")
+
 
 def main():
     global script_dir
@@ -41,10 +49,11 @@ def main():
     output_path = script_dir / "prompt.txt"
 
     with output_path.open("w", encoding="utf-8") as out:
-        write_files_in_dir(server_dir, out)                         # server/*
-        write_files_in_dir(client_dir, out, recurse_into=("src",))  # client/* + client/src/*
+        write_files_in_dir(server_dir, out)
+        write_files_in_dir(client_dir, out)
 
     print(f"Written all filenames and contents to {output_path}")
+
 
 if __name__ == "__main__":
     main()
