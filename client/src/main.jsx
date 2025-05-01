@@ -8,6 +8,9 @@ import axios from 'axios';
 
 import App from './App';
 import Profile from './profile';
+import Spotify from './Spotify';
+import Weather from './Weather';
+import Wishlist from './Wishlist';
 import i18n from './i18n';
 
 // keep <html lang> in sync
@@ -32,6 +35,9 @@ root.render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/profile" element={<RequireAuth><Profile/></RequireAuth>} />
+        <Route path="/spotify" element={<Spotify />} />
+        <Route path="/weather" element={<Weather />} />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

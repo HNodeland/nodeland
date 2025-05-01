@@ -1,3 +1,4 @@
+// client/src/App.jsx
 import './index.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -22,7 +23,6 @@ export default function App() {
         setUser(u);
         if (u) {
           localStorage.setItem('user', JSON.stringify(u));
-          // apply stored language immediately
           if (u.language) {
             i18n.changeLanguage(u.language);
           }
@@ -85,17 +85,35 @@ export default function App() {
         {/* FEATURES */}
         <section id="features" className="bg-brand-deep py-12 px-6 rounded-lg shadow-inner mb-12">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            {['spotify','weather','wishlist'].map(key => (
-              <div key={key} className="p-6 bg-brand-mid rounded-lg shadow-md">
-                <img
-                  src={{ spotify: spotifqrIcon, weather: weatherIcon, wishlist: wishListIcon }[key]}
-                  alt={t(`features.${key}.title`)}
-                  className="h-12 w-12 mx-auto mb-4"
-                />
-                <h3 className="text-xl font-semibold mb-2">{t(`features.${key}.title`)}</h3>
-                <p className="text-brand-light">{t(`features.${key}.desc`)}</p>
-              </div>
-            ))}
+            {['spotify','weather','wishlist'].map(key => {
+              const icons = {
+                spotify: spotifqrIcon,
+                weather: weatherIcon,
+                wishlist: wishListIcon,
+              };
+              const route = `/${key}`; // e.g. /spotify, /weather, /wishlist
+              return (
+                <Link
+                  key={key}
+                  to={route}
+                  className="transform hover:scale-105 hover:shadow-lg transition duration-300"
+                >
+                  <div className="p-6 bg-brand-mid rounded-lg shadow-md h-full flex flex-col items-center">
+                    <img
+                      src={icons[key]}
+                      alt={t(`features.${key}.title`)}
+                      className="h-12 w-12 mx-auto mb-4"
+                    />
+                    <h3 className="text-xl font-semibold mb-2">
+                      {t(`features.${key}.title`)}
+                    </h3>
+                    <p className="text-brand-light">
+                      {t(`features.${key}.desc`)}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
