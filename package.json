@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "i18next": "^25.0.2",
-    "react-i18next": "^15.5.1"
+    "react-i18next": "^15.5.1",
+    "suncalc": "^1.9.0"
   }
 }
