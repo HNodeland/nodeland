@@ -1,17 +1,28 @@
+// src/components/UVIndexGauge.jsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { RadialBarChart, RadialBar, Legend } from 'recharts';
 
 export default function UVIndexGauge({ value }) {
+  const { t } = useTranslation();
   const data = [{ name: 'UV', value }];
+
   return (
     <div className="max-h-[300px] h-full w-full bg-brand-deep p-4 rounded-lg shadow-md">
-      <h4 className="text-center mb-2">UV Index</h4>
+      <h4 className="text-center mb-2">
+        {t('uvIndexGauge.title')}
+      </h4>
       <RadialBarChart
-        width={200} height={200}
-        cx="50%" cy="50%" innerRadius="70%" outerRadius="100%"
+        width={200}
+        height={200}
+        cx="50%"
+        cy="50%"
+        innerRadius="70%"
+        outerRadius="100%"
         barSize={15}
         data={data}
-        startAngle={180} endAngle={0}
+        startAngle={180}
+        endAngle={0}
       >
         <RadialBar dataKey="value" background clockWise />
         <Legend

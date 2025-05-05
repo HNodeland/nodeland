@@ -13,24 +13,34 @@ export default function TemperatureGauge({
   feelsCurrent = '--',
 }) {
   const { t } = useTranslation()
-  const degrees = Array.from({ length: 61 }, (_, i) => i - 30)
 
-  // compute current position percentage
-  const currentNum = Number(current)
-  const currentPos = isNaN(currentNum)
+  // Helper to format a value to one decimal, or pass through placeholders
+  const fmt = v => (typeof v === 'number' ? v.toFixed(1) : v)
+
+  // prepare formatted strings
+  const lowStr     = fmt(low)
+  const currentStr = fmt(current)
+  const highStr    = fmt(high)
+  const feelsLowStr     = fmt(feelsLow)
+  const feelsCurrentStr = fmt(feelsCurrent)
+  const feelsHighStr    = fmt(feelsHigh)
+
+  // compute current position percentage for pointer
+  const currentNum = typeof current === 'number' ? current : parseFloat(current)
+  const posPct = isNaN(currentNum)
     ? 50
     : ((currentNum + 30) / 60) * 100
 
   // derive pointer color from gradient
   let pointerColor = '#fff'
   if (!isNaN(currentNum)) {
-    if (currentPos <= 50) {
-      const ratio = currentPos / 50
+    if (posPct <= 50) {
+      const ratio = posPct / 50
       const r = Math.round(255 * ratio)
       const g = Math.round(255 * ratio)
       pointerColor = `rgb(${r},${g},255)`
     } else {
-      const ratio = (currentPos - 50) / 50
+      const ratio = (posPct - 50) / 50
       const gb = Math.round(255 * (1 - ratio))
       pointerColor = `rgb(255,${gb},${gb})`
     }
@@ -47,11 +57,10 @@ export default function TemperatureGauge({
         {t('temperatureGauge.title')}
       </h4>
 
-      {/* Shift gauge & stats up 50px */}
+      {/* Gauge & pointer */}
       <div className="relative -top-[50px]">
-        {/* Gauge with pointer */}
         <div className="relative w-full h-32 -mt-[30px]">
-          {/* Gradient bar (48px thick) */}
+          {/* Gradient bar */}
           <div
             className="absolute bottom-0 w-full"
             style={{
@@ -61,11 +70,11 @@ export default function TemperatureGauge({
             }}
           />
 
-          {/* animated equilateral triangle pointer rotated 60° */}
+          {/* animated pointer */}
           <motion.div
             className="absolute z-10"
             style={{
-              bottom: '48px',               // base of triangle touching bar
+              bottom: '48px',
               width: 0,
               height: 0,
               borderLeft: `${side/2}px solid transparent`,
@@ -74,80 +83,70 @@ export default function TemperatureGauge({
               transform: 'translateX(-50%) rotate(60deg)',
               transformOrigin: 'center',
             }}
-            animate={{ left: `${currentPos}%` }}
+            animate={{ left: `${posPct}%` }}
             transition={{ type: 'spring', stiffness: 170, damping: 26 }}
           />
 
-          {/* Ticks inside bar */}
-          {degrees.map((deg) => {
-            const pos = ((deg + 30) / 60) * 100
-            let tickHeight = 6
-            if (deg % 10 === 0) tickHeight = 48
-            else if (deg % 5 === 0) tickHeight = 24
+          {/* tick marks and labels */}
+          {Array.from({ length: 61 }, (_, i) => i - 30).map(deg => {
+            const pct = ((deg + 30) / 60) * 100
+            const tickH = deg % 10 === 0 ? 48 : deg % 5 === 0 ? 24 : 6
             return (
-              <div
-                key={deg}
-                className="absolute"
-                style={{
-                  left: `${pos}%`,
-                  bottom: '0',
-                  width: '1px',
-                  height: `${tickHeight}px`,
-                  background: '#fff',
-                  transform: 'translateX(-0.5px)',
-                }}
-              />
+              <React.Fragment key={deg}>
+                <div
+                  className="absolute bg-white"
+                  style={{
+                    left: `${pct}%`,
+                    bottom: 0,
+                    width: '1px',
+                    height: `${tickH}px`,
+                    transform: 'translateX(-0.5px)',
+                  }}
+                />
+                {deg % 10 === 0 && (
+                  <span
+                    className="absolute text-xs text-white"
+                    style={{
+                      left: `${pct}%`,
+                      bottom: '-1.25rem',
+                      transform: 'translateX(-50%)',
+                    }}
+                  >
+                    {deg}
+                  </span>
+                )}
+              </React.Fragment>
             )
           })}
-
-          {/* Labels every 10° */}
-          {degrees
-            .filter((deg) => deg % 10 === 0)
-            .map((deg) => {
-              const pos = ((deg + 30) / 60) * 100
-              return (
-                <span
-                  key={deg}
-                  className="absolute text-xs text-white"
-                  style={{
-                    left: `${pos}%`,
-                    bottom: '-1.25rem',
-                    transform: 'translateX(-50%)',
-                  }}
-                >
-                  {deg}
-                </span>
-              )
-            })}
         </div>
 
-        {/* Primary statistics */}
+        {/* Main stats */}
         <div className="mt-12 grid grid-cols-3 text-center gap-x-4">
           <div>
-            <div className="text-2xl font-bold text-white">{low}°C</div>
+            <div className="text-2xl font-bold text-white">{lowStr}°C</div>
             <div className="text-xs text-brand-light mt-1">
               {t('temperatureGauge.stats.low')}
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-white">{current}°C</div>
+            <div className="text-2xl font-bold text-white">{currentStr}°C</div>
             <div className="text-xs text-brand-light mt-1">
               {t('temperatureGauge.stats.current')}
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-white">{high}°C</div>
+            <div className="text-2xl font-bold text-white">{highStr}°C</div>
             <div className="text-xs text-brand-light mt-1">
               {t('temperatureGauge.stats.high')}
             </div>
           </div>
         </div>
 
-        {/* Feels-like statistics */}
+        {/* Feels-like stats */}
         <div className="mt-4 grid grid-cols-3 text-center gap-x-4">
           <div>
             <div className="text-lg font-semibold text-brand-mid">
-              {feelsLow}°C
+              {feelsLowStr}°C
             </div>
             <div className="text-[10px] text-brand-light mt-1">
               {t('temperatureGauge.feels.low')}
@@ -155,7 +154,7 @@ export default function TemperatureGauge({
           </div>
           <div>
             <div className="text-lg font-semibold text-brand-mid">
-              {feelsCurrent}°C
+              {feelsCurrentStr}°C
             </div>
             <div className="text-[10px] text-brand-light mt-1">
               {t('temperatureGauge.feels.current')}
@@ -163,7 +162,7 @@ export default function TemperatureGauge({
           </div>
           <div>
             <div className="text-lg font-semibold text-brand-mid">
-              {feelsHigh}°C
+              {feelsHighStr}°C
             </div>
             <div className="text-[10px] text-brand-light mt-1">
               {t('temperatureGauge.feels.high')}

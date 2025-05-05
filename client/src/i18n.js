@@ -107,6 +107,28 @@ const resources = {
       // Footer
       footer: {
         copy: '© 2025 Nodeland. All rights reserved.'
+      },
+
+      // Sun Clock
+      sunClock: {
+        title:     'Sun Clock',
+        sunrise:   'Sunrise',
+        sunset:    'Sundown',
+        toSunrise: 'to sunrise',
+        toSunset:  'to sundown'
+      },
+
+      // UV Index Gauge
+      uvIndexGauge: {
+        title: 'UV Index'
+      },
+
+      // Vertical Bars
+      verticalBars: {
+        windSpeed:    'Wind Speed\n(2 min avg.)',    // was "Wind Speed"
+        windGust:     'Wind Speed\n(10 min avg.)',   // was "Wind Gust"
+        uvIndex:      'UV Index',
+        sunIntensity: 'Sun Intensity'
       }
     }
   },
@@ -140,7 +162,7 @@ const resources = {
       // Compass header
       windDirection: 'Vindretning',
 
-      //Temperatur
+      // Temperatur
       temperatureGauge: {
         title: 'Temperaturskala (°C)',
         stats: {
@@ -214,6 +236,19 @@ const resources = {
       // Footer
       footer: {
         copy: '© 2025 Nodeland. Alle rettigheter reservert.'
+      },
+
+      // UV Index Gauge
+      uvIndexGauge: {
+        title: 'UV Index'
+      },
+
+      // Vertical Bars
+      verticalBars: {
+        windSpeed:    'Vindhastighet\n(2 min gj.sn.)',    // was "Vindhastighet"
+        windGust:     'Vindhastighet\n(10 min gj.sn.)',   // was "Vindkast"
+        uvIndex:      'UV-indeks',
+        sunIntensity: 'Solintensitet'
       }
     }
   }
