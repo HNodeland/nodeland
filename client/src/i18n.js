@@ -176,6 +176,15 @@ const resources = {
           high: 'Føltes som',
         }
       },
+      
+      //sun clock
+      sunClock: {
+        title:     'Solklokke',
+        sunrise:   'Soloppgang',
+        sunset:    'Solnedgang',
+        toSunrise: 'til solnedgang',
+        toSunset:  'til solnedgang'
+      },
 
       // About
       aboutTitle: 'Om forfatteren',
