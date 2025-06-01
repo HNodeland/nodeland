@@ -7,25 +7,11 @@ import TemperatureGauge from './components/TemperatureGauge'
 import Compass          from './components/Compass'
 import VerticalBars     from './components/VerticalBars'
 import SunClock         from './components/SunClock'
+import RainGauge        from './components/RainGauge'
 import RainChart        from './components/RainChart'
 import WindChart        from './components/WindChart'
 import TempChart        from './components/TempChart'
 import PressureChart    from './components/PressureChart'
-
-// field positions in the raw data array
-const FIELD_INDICES = {
-  stationId: 0,
-  wind:       { avg2m: 1, avg10m: 2, direction: 3 },
-  temperature:{ outside: 4, dewPoint: 19, feelsLike: 20 },
-  humidity:   5,
-  pressure:   6,
-  rain:       { rate: 7, last1h: 8, last24h: 9, stormTotal: 10, yearTotal: 11 },
-  todayExtremes: { highTemp: 12, timeHigh: 13, lowTemp: 16, timeLow: 17 },
-  currentForecast: {
-    uvIndex:  49,
-    solar:    47  // placeholder index, adjust if needed
-  }
-}
 
 function safeFloat(value) {
   const n = parseFloat(value)
@@ -34,16 +20,22 @@ function safeFloat(value) {
 
 function parse(raw) {
   const parts = raw.trim().split(/\s+/)
-  const F     = FIELD_INDICES
   const data  = {}
 
-  data.windAvg     = safeFloat(parts[F.wind.avg2m])
-  data.windCurrent = safeFloat(parts[F.wind.avg10m])
-  data.windDir     = safeFloat(parts[F.wind.direction])
-  data.temperature = safeFloat(parts[F.temperature.outside])
-  data.dewPoint    = safeFloat(parts[F.temperature.dewPoint])
-  data.uvIndex     = safeFloat(parts[F.currentForecast.uvIndex])
-  data.solar       = safeFloat(parts[F.currentForecast.solar])
+  // Wind & Temperature & Other fields
+  data.windAvg       = safeFloat(parts[1])      // avg wind 2m
+  data.windCurrent   = safeFloat(parts[2])      // gust / avg10m (as in original UI)
+  data.windDir       = safeFloat(parts[3])      // wind direction
+  data.temperature   = safeFloat(parts[4])      // outside temp
+  data.dewPoint      = safeFloat(parts[19])     // dew point
+  data.uvIndex       = safeFloat(parts[8])     // raw UV
+  data.solar         = safeFloat(parts[9])     // global solar radiation
+
+  // New rain fields
+  data.dayRain       = safeFloat(parts[7])      // mm since 00:00 local
+  data.rainLastHour  = safeFloat(parts[10])     // mm in last 60 minutes
+  data.rainLast24h   = safeFloat(parts[11])     // mm in last 24 hours
+  data.rainRate10min = safeFloat(parts[38])     // mm/hr over last 10 minutes
 
   return data
 }
@@ -74,15 +66,19 @@ export default function Weather() {
         if (!statsRes.ok) throw new Error(`Stats status ${statsRes.status}`)
         const statsJson = await statsRes.json()
 
-        // 2) Try raw fetch, fallback silently to stats-only
+        // 2) Try raw fetch, fallback to stats-only
         let parsed = {
-          windAvg: null,
-          windCurrent: null,
-          windDir: null,
-          temperature: statsJson.current,
-          dewPoint: null,
-          uvIndex: null,
-          solar: null
+          windAvg:       null,
+          windCurrent:   null,
+          windDir:       null,
+          temperature:   statsJson.current,
+          dewPoint:      null,
+          uvIndex:       null,
+          solar:         null,
+          dayRain:       null,
+          rainLastHour:  null,
+          rainLast24h:   null,
+          rainRate10min: null,
         }
         try {
           const rawRes = await fetch('/api/weather/raw')
@@ -91,7 +87,7 @@ export default function Weather() {
             parsed = parse(rawText)
           }
         } catch (rawErr) {
-          console.warn('Raw fetch failed, using stats only', rawErr)
+          console.warn('Raw fetch failed, using stats-only', rawErr)
         }
 
         // 3) Override extremes from the DB
@@ -121,20 +117,48 @@ export default function Weather() {
   // Display values & feels
   const displayLow  = stats.low  != null ? stats.low  : '--'
   const displayHigh = stats.high != null ? stats.high : '--'
-  const currTemp    = data.temperature != null ? data.temperature : '--'
-  const vKmh        = data.windCurrent != null ? data.windCurrent * 3.6 : null
 
-  const feelsLow     = stats.low  != null && vKmh != null ? windChill(stats.low,   vKmh) : '--'
-  const feelsCurrent = data.temperature != null && vKmh != null
-                       ? windChill(data.temperature, vKmh)
-                       : '--'
-  const feelsHigh    = stats.high != null && vKmh != null ? windChill(stats.high,  vKmh) : '--'
+  // <-- Updated fallback here: if data.temperature is null, use stats.current -->
+  const currTemp = data.temperature != null
+    ? data.temperature
+    : stats.current != null
+    ? stats.current
+    : '--'
+
+  const vKmh = data.windCurrent != null ? data.windCurrent * 3.6 : null
+
+  const feelsLow     = stats.low  != null && vKmh != null
+    ? windChill(stats.low,   vKmh)
+    : '--'
+  const feelsCurrent =
+    (data.temperature != null || stats.current != null) && vKmh != null
+      ? windChill(
+          data.temperature != null ? data.temperature : stats.current,
+          vKmh
+        )
+      : '--'
+  const feelsHigh = stats.high != null && vKmh != null
+    ? windChill(stats.high, vKmh)
+    : '--'
 
   // sunrise/sunset
   const now = new Date()
   const { sunrise, sunset } = SunCalc.getTimes(now, 60.24111, 10.69972)
-  const sunriseStr = sunrise.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  const sunsetStr  = sunset .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const sunriseStr = sunrise.toLocaleTimeString([], {
+    hour:   '2-digit',
+    minute: '2-digit',
+  })
+  const sunsetStr = sunset.toLocaleTimeString([], {
+    hour:   '2-digit',
+    minute: '2-digit',
+  })
+
+  // Rain values
+  const dayRainValue      = data.dayRain != null ? data.dayRain : null
+  const rainRate10Value   = data.rainRate10min != null ? data.rainRate10min : null
+  const rainLastHourValue = data.rainLastHour != null ? data.rainLastHour : null
+  const rainLast24hValue  = data.rainLast24h != null ? data.rainLast24h : null
+  const uvIndex_raw       = data.uvIndex != null ? data.uvIndex : null
 
   return (
     <div className="min-h-screen bg-brand-dark text-white p-6">
@@ -164,13 +188,26 @@ export default function Weather() {
         }} />
       </div>
 
-      {/* SunClock row */}
+      {/* SunClock & RainGauge row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        {/* SunClock */}
         <div className="h-[200px] bg-brand-deep rounded-lg shadow-md flex items-center justify-center">
           <SunClock sunrise={sunriseStr} sunset={sunsetStr} />
         </div>
-        <div className="h-[200px] bg-brand-deep rounded-lg shadow-md" />
-        <div className="h-[200px] bg-brand-deep rounded-lg shadow-md" />
+
+        {/* RainGauge + stats in its original middle column */}
+        <div className="h-[200px] bg-brand-deep rounded-lg shadow-md p-4 flex items-center justify-center">
+          <RainGauge
+            dayRain={dayRainValue}
+            rainRate10min={rainRate10Value}
+            rainLastHour={rainLastHourValue}
+            rainLast24h={rainLast24hValue}
+            uvIndex_raw={uvIndex_raw}
+          />
+        </div>
+
+        {/* Placeholder for third column (if needed) */}
+        <div />
       </div>
 
       {/* Historical Charts */}
