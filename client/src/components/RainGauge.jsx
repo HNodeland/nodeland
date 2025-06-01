@@ -5,7 +5,6 @@ export default function RainGauge({
   dayRain = 0,
   rainRate10min = 0,
   rainLastHour = 0,
-  rainLast24h = 0,
   uvIndex_raw = 0, // raw UV sensor value from weatherService.js
 }) {
   // Convert raw UV to UVI
@@ -69,7 +68,6 @@ export default function RainGauge({
   const dayRainStr = `${dayRain.toFixed(2)}mm`
   const rainRateHourStr = fmt2(rainRate10min, 'mm/hr')
   const rainLastHourStr = fmt2(rainLastHour, 'mm')
-  const rainLast24hStr = fmt2(rainLast24h, 'mm')
 
   // Determine whether to show cloud or sun based solely on current rain rate and UV index
   const showCloud = rainRate10min <= 0 && uvIndex <= 0
@@ -312,10 +310,6 @@ export default function RainGauge({
           <div>
             <p className="text-sm font-semibold">{rainLastHourStr}</p>
             <p className="opacity-80">Rain in the past Hour</p>
-          </div>
-          <div>
-            <p className="text-sm font-semibold">{rainLast24hStr}</p>
-            <p className="opacity-80">Rain in the past 24 hours</p>
           </div>
         </div>
       </div>

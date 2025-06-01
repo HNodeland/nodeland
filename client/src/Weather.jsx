@@ -28,13 +28,12 @@ function parse(raw) {
   data.windDir       = safeFloat(parts[3])      // wind direction
   data.temperature   = safeFloat(parts[4])      // outside temp
   data.dewPoint      = safeFloat(parts[19])     // dew point
-  data.uvIndex       = safeFloat(parts[8])     // raw UV
-  data.solar         = safeFloat(parts[9])     // global solar radiation
+  data.uvIndex       = safeFloat(parts[8])      // raw UV
+  data.solar         = safeFloat(parts[9])      // global solar radiation
 
   // New rain fields
   data.dayRain       = safeFloat(parts[7])      // mm since 00:00 local
   data.rainLastHour  = safeFloat(parts[10])     // mm in last 60 minutes
-  data.rainLast24h   = safeFloat(parts[11])     // mm in last 24 hours
   data.rainRate10min = safeFloat(parts[38])     // mm/hr over last 10 minutes
 
   return data
@@ -77,7 +76,6 @@ export default function Weather() {
           solar:         null,
           dayRain:       null,
           rainLastHour:  null,
-          rainLast24h:   null,
           rainRate10min: null,
         }
         try {
@@ -201,7 +199,6 @@ export default function Weather() {
             dayRain={dayRainValue}
             rainRate10min={rainRate10Value}
             rainLastHour={rainLastHourValue}
-            rainLast24h={rainLast24hValue}
             uvIndex_raw={uvIndex_raw}
           />
         </div>
