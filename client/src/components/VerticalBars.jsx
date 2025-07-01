@@ -6,8 +6,8 @@ export default function VerticalBars({ data }) {
   const { t } = useTranslation();
 
   const METRICS = [
-    { key: 'windCurrent',  label: t('verticalBars.windSpeed'),    unit: ' m/s',   max: 20   },
-    { key: 'windAvg',      label: t('verticalBars.windGust'),     unit: ' m/s',   max: 30   },
+    { key: 'windCurrent',  label: t('verticalBars.windCurrent'),    unit: ' m/s',   max: 20   },
+    { key: 'windAvg',      label: t('verticalBars.windAvg'),     unit: ' m/s',   max: 30   },
     { key: 'uvIndex',      label: t('verticalBars.uvIndex'),      unit: '',       max: 11   },
     { key: 'solarReading', label: t('verticalBars.sunIntensity'), unit: ' W/m²', max: 1000 }
   ];

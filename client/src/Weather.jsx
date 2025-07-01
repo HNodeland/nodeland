@@ -23,18 +23,18 @@ function parse(raw) {
   const data  = {}
 
   // Wind & Temperature & Other fields
-  data.windAvg       = safeFloat(parts[1])      // avg wind 2m
-  data.windCurrent   = safeFloat(parts[2])      // gust / avg10m (as in original UI)
-  data.windDir       = safeFloat(parts[3])      // wind direction
+  data.windAvg       = safeFloat(parts[158])      // avg wind / 10 min
+  data.windCurrent   = safeFloat(parts[2])        // current windspeed
+  data.windDir       = safeFloat(parts[3])        // wind direction
   data.temperature   = safeFloat(parts[4])      // outside temp
-  data.dewPoint      = safeFloat(parts[19])     // dew point
-  data.uvIndex       = safeFloat(parts[8])      // raw UV
-  data.solar         = safeFloat(parts[9])      // global solar radiation
+  data.dewPoint      = safeFloat(parts[72])     // dew point
+  data.uvIndex       = safeFloat(parts[79])      // raw UV
+  data.solar         = safeFloat(parts[127])      // global solar radiation
 
   // New rain fields
   data.dayRain       = safeFloat(parts[7])      // mm since 00:00 local
-  data.rainLastHour  = safeFloat(parts[10])     // mm in last 60 minutes
-  data.rainRate10min = safeFloat(parts[38])     // mm/hr over last 10 minutes
+  data.yesterdayRain  = safeFloat(parts[10])     // mm in last 60 minutes
+  data.rainRate10min = safeFloat(parts[10])     // mm/hr over last 10 minutes
 
   return data
 }
@@ -75,7 +75,7 @@ export default function Weather() {
           uvIndex:       null,
           solar:         null,
           dayRain:       null,
-          rainLastHour:  null,
+          yesterdayRain:  null,
           rainRate10min: null,
         }
         try {
@@ -102,7 +102,7 @@ export default function Weather() {
     }
 
     fetchData()
-    const id = setInterval(fetchData, 60 * 1000) // every minute
+    const id = setInterval(fetchData, 2 * 1000) // every minute
     return () => {
       isMounted = false
       clearInterval(id)
@@ -154,7 +154,7 @@ export default function Weather() {
   // Rain values
   const dayRainValue      = data.dayRain != null ? data.dayRain : null
   const rainRate10Value   = data.rainRate10min != null ? data.rainRate10min : null
-  const rainLastHourValue = data.rainLastHour != null ? data.rainLastHour : null
+  const yesterdayRainValue = data.yesterdayRain != null ? data.yesterdayRain : null
   const rainLast24hValue  = data.rainLast24h != null ? data.rainLast24h : null
   const uvIndex_raw       = data.uvIndex != null ? data.uvIndex : null
 
@@ -198,7 +198,7 @@ export default function Weather() {
           <RainGauge
             dayRain={dayRainValue}
             rainRate10min={rainRate10Value}
-            rainLastHour={rainLastHourValue}
+            yesterdayRain={yesterdayRainValue}
             uvIndex_raw={uvIndex_raw}
           />
         </div>

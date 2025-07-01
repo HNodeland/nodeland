@@ -125,8 +125,8 @@ const resources = {
 
       // Vertical Bars
       verticalBars: {
-        windSpeed:    'Wind Speed\n(2 min avg.)',    // was "Wind Speed"
-        windGust:     'Wind Speed\n(10 min avg.)',   // was "Wind Gust"
+        windCurrent:    'Wind Speed\n(current)',   
+        windAvg:        'Wind Speed\n(10 min avg.)', 
         uvIndex:      'UV Index',
         sunIntensity: 'Sun Intensity'
       }
@@ -254,8 +254,8 @@ const resources = {
 
       // Vertical Bars
       verticalBars: {
-        windSpeed:    'Vindhastighet\n(2 min gj.sn.)',    // was "Vindhastighet"
-        windGust:     'Vindhastighet\n(10 min gj.sn.)',   // was "Vindkast"
+        windCurrent:    'Vindhastighet\n(nå)',    // was "Vindhastighet"
+        windAvg:     'Vindhastighet\n(10 min gj.sn.)',   // was "Vindkast"
         uvIndex:      'UV-indeks',
         sunIntensity: 'Solintensitet'
       }
