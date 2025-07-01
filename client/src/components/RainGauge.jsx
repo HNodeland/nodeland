@@ -4,11 +4,11 @@ import React, { useMemo } from 'react'
 export default function RainGauge({
   dayRain = 0,
   rainRate10min = 0,
-  rainLastHour = 0,
-  uvIndex_raw = 0, // raw UV sensor value from weatherService.js
+  yesterdayRain = 0,
+  vp_solar_wm2 = 0,
 }) {
   // Convert raw UV to UVI
-  const uvIndex = uvIndex_raw / 32
+
 
   // Constants
   const maxRain = 150 // mm capacity
@@ -67,11 +67,11 @@ export default function RainGauge({
   const fmt2 = (val, unit) => (val != null ? `${val.toFixed(2)} ${unit}` : '--')
   const dayRainStr = `${dayRain.toFixed(2)}mm`
   const rainRateHourStr = fmt2(rainRate10min, 'mm/hr')
-  const rainLastHourStr = fmt2(rainLastHour, 'mm')
+  const yesterdayRainStr = fmt2(yesterdayRain, 'mm')
 
   // Determine whether to show cloud or sun based solely on current rain rate and UV index
-  const showCloud = rainRate10min <= 0 && uvIndex <= 0
-  const showSun = rainRate10min <= 0 && uvIndex > 0
+  const showCloud = rainRate10min <= 0 && vp_solar_wm2 <= 500
+  const showSun = rainRate10min <= 0 && vp_solar_wm2 > 500
 
   return (
     <div className="w-full px-4">
@@ -94,7 +94,7 @@ export default function RainGauge({
             viewBox={`0 0 ${svgWidth} ${svgHeight}`}
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Cloud animation when rainRate10min ≤ 0 and uvIndex ≤ 0 */}
+            {/* Cloud animation when rainRate10min ≤ 0 and vp_solar_wm2 ≤ 500 */}
             {showCloud && (
               <g>
                 <circle cx={sunCenterX - 8} cy={sunCenterY} r="6" fill="#9CA3AF">
@@ -127,7 +127,7 @@ export default function RainGauge({
               </g>
             )}
 
-            {/* Sun animation when rainRate10min ≤ 0 and uvIndex > 0 */}
+            {/* Sun animation when rainRate10min ≤ 0 and vp_solar_wm2 > 500 */}
             {showSun && (
               <g>
                 {rayAngles.map((angle, i) => {
@@ -308,7 +308,7 @@ export default function RainGauge({
             <p className="opacity-80">Current Rainfall</p>
           </div>
           <div>
-            <p className="text-sm font-semibold">{rainLastHourStr}</p>
+            <p className="text-sm font-semibold">{yesterdayRainStr}</p>
             <p className="opacity-80">Rain in the past Hour</p>
           </div>
         </div>
