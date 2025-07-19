@@ -1,16 +1,15 @@
-# Nodeland.no
+# [Haakon.Nodeland.no]
+[Now hosted on haakon.nodeland.no!](https://haakon.nodeland.no)
 
 This is a project i've been working on for a little while.
 
-The goal of this project is to familiarize with some new technologies like react and node js. Three apps are going to be created and (hopefully hosted) here.
+The goal of this project is to familiarize myself with some new technologies like react and node js. Three apps are going to be created and (hopefully hosted) here.
 
 ![home-page](./docs/home-page.png)
 
-### Spotify QR
-I want to genereate 2-sided cards with a spotify url/qr code on one side and the songs artis, release year and song name on the other side. The user will provide a public spotify play list, and then receive a PDF that can be printed, double sided, allowing cards to be cut out and used.
 
-
-### Harestua Weather
+## Apps
+### 1. Harestua Weather
 As of right now, [nodeland.no](www.nodeland.no) is used to display weather data gathered by a weather station. It is pretty outdated, and it is in dire need of an upgrade. This is a good time to try to learn some cool front-end tricks. This is how [nodeland.no](www.nodeland.no) looking right now:
 
 ![nodeland-old](./docs/nodeland-old.png)
@@ -20,10 +19,17 @@ And this is how far i've gotten in the development of the upgrade:
 ![nodeland-new](./docs/weather-app.png)
 2 of the components are completed, both are fetching data from the weather station at [nodeland.no/clientraw.txt](www.nodeland.no/clientraw.txt)
 
-### Wish list
-The 3rd project is something my girlfriend and I discussed. We wanted an app where we could create a wish list, typically for weddings or large events, and then share it with others. The ones we shared the wish list with could then log in and check off something from the list. When others are checking out the wish list, they will be able to see who is going to get what. When the creators are checking out the wish-list however, they will not be able to see this. 
+### 2. Spotify QR
+I want to generate a pdf or some other physically printable file that contains several 2-sided "cards" with 
+* A spotify url or a qr code on one side.
+* The corresponding songs artist, release year and song name on the other side. 
 
-The purpose of this is app is to avoid people buying the same gifts for these larger events. 
+The user will provide a public spotify playlist, and then receive a PDF that can be printed double sided, allowing cards to be cut out and used for a games or other activites.
+
+### 3. Wish list
+The third project is an app where we can create a wish list, typically for weddings or large events, and then share it with others. Those we share the wish list with can then log in and check off the items that they will buy as gifts for the event. When another person checks out the wish list, they will be able to see who is going to purchase which gifts. They will then check off some other items from the wish-list, reducing the likelihood of two people buying the same gift for the event. 
+
+If the creators of the wish list ever checks out their wish list, they will only be able to see the number of items that are checked off, not which items are checked off by who. They will find that out at the event :)
 
 
 ### Future plans

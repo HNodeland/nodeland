@@ -1,0 +1,21 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/nodeland/haakon.nodeland.no"
+PassengerBaseURI "/"
+PassengerNodejs "/home/nodeland/nodevenv/haakon.nodeland.no/20/bin/node"
+PassengerAppType node
+PassengerStartupFile server/src/server.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+<IfModule mod_passenger.c>
+  PassengerEnabled on
+  PassengerAppRoot /home/nodeland/haakon.nodeland.no/nodeland/server
+  PassengerStartupFile src/server.js
+  # optional: set NODE_ENV
+  PassengerAppEnv production
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^.*$ src/server.js [L,QSA,PT]
+</IfModule>
