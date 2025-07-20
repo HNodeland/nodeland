@@ -61,12 +61,9 @@ export default function App() {
               ? t('welcomeLoggedIn', { name: user.displayName })
               : t('welcomeLoggedOut')}
           </h1>
-          <p className="text-lg md:text-xl mb-8 text-brand-light">
-            {t('subtitle')}
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <a
-              href="https://github.com/HNodeland"
+              href="https://github.com/HNodeland/Nodeland"
               target="_blank"
               rel="noopener noreferrer"
               className="flex-grow sm:flex-none px-6 py-3 bg-brand-accent text-brand-dark font-medium rounded-md hover:bg-brand-light transition text-center"
@@ -74,12 +71,15 @@ export default function App() {
               {t('github')}
             </a>
             <a
-              href="mailto:haakon@nodeland.no"
+              href="mailto:haakonno@live.no"
               className="flex-grow sm:flex-none px-6 py-3 border-2 border-brand-light text-brand-light font-medium rounded-md hover:bg-brand-light hover:text-brand-dark transition text-center"
             >
               {t('email')}
             </a>
           </div>
+          <p className="text-lg md:text-xl mb-8 text-brand-light">
+            {t('subtitle')}
+          </p>
         </header>
 
         {/* FEATURES */}
