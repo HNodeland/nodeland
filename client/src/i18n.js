@@ -53,13 +53,13 @@ const resources = {
       },
 
       // About
-      aboutTitle: 'About the Author',
-      aboutLine1: 'Håkon Nodeland is a Data Science student at the University of Stavanger. He is also a part-time developer for Ocean IMR.',
-      aboutLine2: 'This page will be used to display his programming, development and design capabilities in a full-stack project.',
+      aboutTitle: 'About me',
+      aboutLine1: 'I am a Data Science student at the University of Stavanger. I am currently doing my final year here. I am also a part-time developer for Ocean IMR, where I have been working for the past 3 years.',
+      aboutLine2: 'This full-stack project has been built to learn more about react, node.js. Additionally, I wanted to learn the skill of coding with a lot of help from AI, as I had no prior knowledge with react or node.js.',
 
       // Tech Stack
       stackTitle: 'Tech Stack',
-      stackDesc: 'Nodeland.no is powered by a modern JavaScript stack: React with React Router and Axios for dynamic, API-driven UI; Tailwind CSS and Vite for rapid, highly optimized front-end builds; Node.js with Express for the server; MySQL for persistent data storage; and Passport.js (Google OAuth) for secure authentication.',
+      stackDesc: 'Haakon.Nodeland.no is driven by a JavaScript stack: React with React Router and Axios for API-driven UI; Tailwind CSS and Vite for rapid, highly optimized front-end builds; Node.js with Express for the server; MySQL for persistent data storage; and Passport.js (Google OAuth) for secure authentication.',
 
       // Courses
       coursesTitle: 'My thesis along with important courses I have completed at UiS',
@@ -69,31 +69,31 @@ const resources = {
           desc: 'Positioning of vehicles and pedestrians in tunnels using Bluetooth beacons and mobile phones.'
         },
         dat200: {
-          title: 'DAT200 – Algorithms & Data Structures',
+          title: 'DAT200 - Algorithms & Data Structures',
           desc: 'Implementation and analysis of core algorithms and data structures for efficient problem-solving.'
         },
         dat320: {
-          title: 'DAT320 – Operating Systems & System Programming',
+          title: 'DAT320 - Operating Systems & System Programming',
           desc: 'Study of OS architectures, concurrency, memory management, and low-level system programming.'
         },
         dat230_240: {
-          title: 'DAT230/240 – Communication Technology 1 & 2',
+          title: 'DAT230/300 - Communication Technology 1 & 2',
           desc: 'Fundamentals of network communication, protocols, and data transmission methods.'
         },
         dat240: {
-          title: 'DAT240 – Advanced Programming',
+          title: 'DAT240 - Advanced Programming',
           desc: 'Exploration of advanced programming paradigms, design patterns, and best practices.'
         },
         dat535: {
-          title: 'DAT535 – Data-Intensive Systems & Engineering',
+          title: 'DAT535 - Data-Intensive Systems & Engineering',
           desc: 'Design and implementation of scalable, fault-tolerant data pipelines and storage solutions.'
         },
         dat600: {
-          title: 'DAT600 – Algorithm Theory',
+          title: 'DAT600 - Algorithm Theory',
           desc: 'In-depth study of computational complexity, proof techniques, and algorithmic theory.'
         },
         ele520: {
-          title: 'ELE520 – Machine Learning',
+          title: 'ELE520 - Machine Learning',
           desc: 'Principles and applications of supervised and unsupervised learning algorithms.'
         }
       },
@@ -195,13 +195,13 @@ const resources = {
       },
 
       // About
-      aboutTitle: 'Om forfatteren',
-      aboutLine1: 'Håkon Nodeland er data science-student ved Universitetet i Stavanger. Han jobber også deltid som utvikler for Ocean IMR.',
-      aboutLine2: 'Denne siden vil bli brukt til å vise hans programmerings-, utviklings- og designkapasitet i et fullstack-prosjekt.',
+      aboutTitle: 'Om meg',
+      aboutLine1: 'Jeg studerer Data Science ved Universitetet i Stavanger. Jeg er nå i mitt siste studieår. Jeg jobber også deltid som utvikler for Ocean IMR, hvor jeg har vært de siste tre årene.',
+      aboutLine2: 'Dette fullstack-prosjektet er bygd for å lære mer om React og Node.js. I tillegg ønsket jeg å lære meg programmering med god hjelp fra AI, siden jeg ikke hadde noen forkunnskaper i React eller Node.js.',
 
       // Tech Stack
       stackTitle: 'Teknologier',
-      stackDesc: 'Nodeland.no drives av en moderne JavaScript-stack: React med React Router og Axios for dynamisk, API-drevet UI; Tailwind CSS og Vite for raske, svært optimaliserte front-end-builds; Node.js med Express for serveren; MySQL for vedvarende datalagring; og Passport.js (Google OAuth) for sikker autentisering.',
+      stackDesc: 'Haakon.Nodeland.no drives av en JavaScript-stack: React med React Router og Axios for API-drevet UI; Tailwind CSS og Vite for raske, svært optimaliserte front-end-builds; Node.js med Express for serveren; MySQL for datalagring; og Passport.js (Google OAuth) for sikker autentisering.',
 
       // Courses
       coursesTitle: 'Min hovedoppgave og viktige fag ved UiS',
@@ -211,31 +211,31 @@ const resources = {
           desc: 'Posisjonering av kjøretøy og fotgjengere i tunneler ved bruk av Bluetooth-beacons og mobiltelefoner.'
         },
         dat200: {
-          title: 'DAT200 – Algoritmer og datastrukturer',
+          title: 'DAT200 - Algoritmer og datastrukturer',
           desc: 'Implementering og analyse av kjernealgoritmer og datastrukturer for effektiv problemløsning.'
         },
         dat320: {
-          title: 'DAT320 – Operativsystemer og systemprogrammering',
+          title: 'DAT320 - Operativsystemer og systemprogrammering',
           desc: 'Studie av OS-arkitekturer, samtidighet, minnehåndtering og systemprogrammering på lavt nivå.'
         },
         dat230_240: {
-          title: 'DAT230/240 – Kommunikasjonsteknologi 1 & 2',
+          title: 'DAT230/240 - Kommunikasjonsteknologi 1 & 2',
           desc: 'Grunnleggende nettverkskommunikasjon, protokoller og datatransmisjonsmetoder.'
         },
         dat240: {
-          title: 'DAT240 – Avansert programmering',
+          title: 'DAT240 - Avansert programmering',
           desc: 'Utforskning av avanserte programmeringsparadigmer, designmønstre og beste praksis.'
         },
         dat535: {
-          title: 'DAT535 – Datain­tensive systemer & ingeniørkunst',
+          title: 'DAT535 - Dataintensive systemer & ingeniørkunst',
           desc: 'Design og implementering av skalerbare, feiltolerante datapipelines og lagringsløsninger.'
         },
         dat600: {
-          title: 'DAT600 – Algoritmeteori',
+          title: 'DAT600 - Algoritmeteori',
           desc: 'Inngående studie av beregningskompleksitet, bevisteknikker og algoritmeteori.'
         },
         ele520: {
-          title: 'ELE520 – Maskinlæring',
+          title: 'ELE520 - Maskinlæring',
           desc: 'Prinsipper og anvendelser av overvåket og ikke-overvåket læring.'
         }
       },
