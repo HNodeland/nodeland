@@ -1,4 +1,4 @@
-# [Haakon.Nodeland.no]
+# Haakon.Nodeland.no
 [Now hosted on haakon.nodeland.no!](https://haakon.nodeland.no)
 
 This is a project i've been working on for a little while.
