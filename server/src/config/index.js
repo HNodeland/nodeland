@@ -4,7 +4,7 @@ dotenv.config();
 
 export default {
   port: Number(process.env.PORT) || 4000,
-  clientOrigin: process.env.CLIENT_URL || 'http://localhost:5173',
+  clientOrigin: process.env.CLIENT_URL || 'https://haakon.nodeland.no',
   sessionSecret: process.env.SESSION_SECRET,
   db: {
     host: process.env.DB_HOST,
