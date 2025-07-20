@@ -1,4 +1,4 @@
-# [Haakon.Nodeland.no]
+# Haakon.Nodeland.no
 [Now hosted on haakon.nodeland.no!](https://haakon.nodeland.no)
 
 This is a project i've been working on for a little while.
@@ -17,7 +17,7 @@ As of right now, [nodeland.no](www.nodeland.no) is used to display weather data 
 
 And this is how far i've gotten in the development of the upgrade:
 ![nodeland-new](./docs/weather-app.png)
-2 of the components are completed, both are fetching data from the weather station at [nodeland.no/clientraw.txt](www.nodeland.no/clientraw.txt)
+Five of the components are completed, both are fetching data from the weather station at [nodeland.no/clientraw.txt](www.nodeland.no/clientraw.txt)
 
 ### 2. Spotify QR
 I want to generate a pdf or some other physically printable file that contains several 2-sided "cards" with 
