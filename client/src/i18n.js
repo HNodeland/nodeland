@@ -27,6 +27,10 @@ const resources = {
         wishlist: {
           title: 'Wish List',
           desc: 'Create your own wish list and share it with others.'
+        },
+        construction:{
+          title: 'Construction',
+          desc:'Construction'
         }
       },
 
@@ -156,6 +160,10 @@ const resources = {
         wishlist: {
           title: 'Ønskeliste',
           desc: 'Lag din egen ønskeliste og del den med andre.'
+        },
+        construction:{
+          title: 'Arbeid',
+          desc:'Arbeid'
         }
       },
 

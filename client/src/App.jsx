@@ -61,6 +61,9 @@ export default function App() {
               ? t('welcomeLoggedIn', { name: user.displayName })
               : t('welcomeLoggedOut')}
           </h1>
+          <p className="text-lg md:text-xl mb-8 text-brand-light">
+            {t('subtitle')}
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <a
               href="https://github.com/HNodeland/Nodeland"
@@ -77,9 +80,6 @@ export default function App() {
               {t('email')}
             </a>
           </div>
-          <p className="text-lg md:text-xl mb-8 text-brand-light">
-            {t('subtitle')}
-          </p>
         </header>
 
         {/* FEATURES */}
@@ -91,14 +91,25 @@ export default function App() {
                 weather: weatherIcon,
                 wishlist: wishListIcon,
               };
-              const route = `/${key}`; // e.g. /spotify, /weather, /wishlist
+              const route = `/${key}`;
+              const needsRibbon = key === 'spotify' || key === 'wishlist';
+
               return (
                 <Link
                   key={key}
                   to={route}
                   className="transform hover:scale-105 hover:shadow-lg transition duration-300"
                 >
-                  <div className="p-6 bg-brand-mid rounded-lg shadow-md h-full flex flex-col items-center">
+                  <div className="relative p-6 bg-brand-mid rounded-lg shadow-md h-full flex flex-col items-center">
+                    {needsRibbon && (
+                      <div
+                        className="absolute top-[22px] left-[-30px] bg-yellow-400 text-black text-xs font-bold uppercase w-32 h-6 flex items-center justify-center transform -rotate-45 shadow-lg z-10"
+                        style={{ clipPath: 'polygon(19% 0, 81% 0, 100% 100%, 0% 100%)' }}
+                      >
+                        {t(`features.construction.title`)}
+                      </div>
+                    )}
+
                     <img
                       src={icons[key]}
                       alt={t(`features.${key}.title`)}
@@ -116,7 +127,6 @@ export default function App() {
             })}
           </div>
         </section>
-
         {/* ABOUT */}
         <section id="about" className="py-12 px-6 text-center md:text-left mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('aboutTitle')}</h2>
