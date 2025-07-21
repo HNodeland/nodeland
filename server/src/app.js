@@ -2,6 +2,7 @@ import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import cors from 'cors';
+import path from 'path';  // Added import for path module
 import config from './config/index.js';
 import pool from './db/pool.js';
 import setupPassport from './services/authService.js';

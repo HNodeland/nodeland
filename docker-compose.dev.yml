@@ -1,6 +1,7 @@
 services:
   db:
     image: mysql:8.0
+    command: --event-scheduler=ON
     container_name: nodeland-db
     restart: always
     environment:

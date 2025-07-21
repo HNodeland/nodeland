@@ -5,6 +5,9 @@ CREATE DATABASE IF NOT EXISTS nodeland
   COLLATE utf8mb4_unicode_ci;
 USE nodeland;
 
+-- Grant EVENT privilege to the user
+GRANT EVENT ON *.* TO 'nodeland'@'%';
+
 -- ── users ───────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
   id           VARCHAR(255)      NOT NULL,

@@ -3,7 +3,8 @@ import { Router } from 'express'
 import axios from 'axios'
 import config from '../config/index.js'
 import pool from '../db/pool.js'
-import { pollWeather } from '../services/weatherService.js'
+import { pollWeather, latestParsed } from '../services/weatherService.js'
+import { parseRaw } from '../utils/parseRaw.js'
 
 const router = Router()
 
@@ -11,25 +12,41 @@ const router = Router()
 pollWeather()
 setInterval(pollWeather, 60_000)
 
+// ── current ───────────────────────────────────────────────────────────────
+router.get('/current', (_req, res) => {
+  if (latestParsed) {
+    res.json(latestParsed)
+  } else {
+    res.status(503).json({ error: 'No current data available yet' })
+  }
+})
+
 // ── history ───────────────────────────────────────────────────────────────
 router.get('/history', async (_req, res) => {
   try {
     const [rows] = await pool.execute(
       `SELECT
          FROM_UNIXTIME(ts/1000,'%H:%i') AS time,
-         temp,
-         wind,
-         pressure,
-         rain
+         out_temp,
+         current_windspeed AS wind,
+         barometer AS pressure,
+         day_rain AS rain,
+         average_windspeed,
+         wind_dir,
+         rain_rate_mm_min,
+         yesterday_rain,
+         uv_index,
+         vp_solar_wm2,
+         dew_point
        FROM weather_readings
        WHERE ts >= UNIX_TIMESTAMP(CURDATE())*1000
        ORDER BY ts ASC`
     )
     res.json({
       windHistory:     rows.map(r => ({ time: r.time, wind: r.wind })),
-      tempHistory:     rows.map(r => ({ time: r.time, temp: r.temp })),
+      tempHistory:     rows.map(r => ({ time: r.time, temp: r.out_temp })),
       pressureHistory: rows.map(r => ({ time: r.time, pressure: r.pressure })),
-      rainHistory:     rows.map(r => ({ time: r.time, rain: r.rain })),
+      rainHistory:     rows.map(r => ({ time: r.time, rain: r.day_rain })),
     })
   } catch (err) {
     console.error('Error fetching weather history:', err)
@@ -38,24 +55,23 @@ router.get('/history', async (_req, res) => {
 })
 
 // ── stats ─────────────────────────────────────────────────────────────────
-// Always fetch low/high from the DB. Use raw packet only for current temperature.
 router.get('/stats', async (_req, res) => {
   let currentFromRaw = null
 
-  // 1) Try to fetch current temperature from raw packet
-  try {
-    const upstream = await axios.get(config.rawUrl)
-    const parts    = upstream.data.trim().split(/\s+/)
-    const currentRaw = parseFloat(parts[4])
-    currentFromRaw = Number.isNaN(currentRaw) ? null : currentRaw
-  } catch (rawErr) {
-    console.warn('Raw fetch for current temperature failed:', rawErr)
-    // We'll fall back to DB for current if needed
+  if (latestParsed) {
+    currentFromRaw = latestParsed.out_temp
+  } else {
+    try {
+      const upstream = await axios.get(config.rawUrl)
+      const parsed = parseRaw(upstream.data)
+      currentFromRaw = parsed.out_temp
+    } catch (rawErr) {
+      console.warn('Raw fetch for current temperature failed:', rawErr)
+    }
   }
 
-  // 2) Fetch low/high/current from weather_stats in DB
   try {
-    const today = new Date().toISOString().slice(0, 10) // "YYYY-MM-DD"
+    const today = new Date().toISOString().slice(0, 10)
     const [rows] = await pool.execute(
       `SELECT low, high, current
          FROM weather_stats
@@ -64,7 +80,6 @@ router.get('/stats', async (_req, res) => {
     )
 
     if (rows.length === 0) {
-      // No row in weather_stats yet for today
       return res.json({
         low:     null,
         high:    null,
@@ -72,7 +87,6 @@ router.get('/stats', async (_req, res) => {
       })
     }
 
-    // Use DB low/high. For current, prefer raw if available, otherwise DB value.
     const dbStats = rows[0]
     return res.json({
       low:     dbStats.low,
