@@ -45,8 +45,8 @@ export default function DailyWindChart() {
           <Tooltip contentStyle={{ backgroundColor: '#2D3B4B', border: 'none' }} />
           <Legend />
           <Line type="monotone" dataKey="max_wind" name="Max Wind" stroke="#ff7300" dot={false} />
-          <Line type="monotone" dataKey="avg_wind" name="Avg Wind" stroke="#83BBF5" dot={false} />
-          <Line type="monotone" dataKey="min_wind" name="Min Wind" stroke="#228B22" dot={false} />
+          <Line type="monotone" dataKey="avg_wind" name="Avg Wind" stroke="#228B22" dot={false} />
+          <Line type="monotone" dataKey="min_wind" name="Min Wind" stroke="#83BBF5" dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

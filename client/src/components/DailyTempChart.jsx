@@ -45,8 +45,8 @@ export default function DailyTempChart() {
           <Tooltip contentStyle={{ backgroundColor: '#2D3B4B', border: 'none' }} />
           <Legend />
           <Line type="monotone" dataKey="max_temp" name="Max Temp" stroke="#ff7300" dot={false} />
-          <Line type="monotone" dataKey="avg_temp" name="Avg Temp" stroke="#83BBF5" dot={false} />
-          <Line type="monotone" dataKey="min_temp" name="Min Temp" stroke="#228B22" dot={false} /> {/* Darker green */}
+          <Line type="monotone" dataKey="avg_temp" name="Avg Temp" stroke="#228B22" dot={false} />
+          <Line type="monotone" dataKey="min_temp" name="Min Temp" stroke="#83BBF5" dot={false} /> {/* Darker green */}
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -45,8 +45,8 @@ export default function DailyPressureChart() {
           <Tooltip contentStyle={{ backgroundColor: '#2D3B4B', border: 'none' }} />
           <Legend />
           <Line type="monotone" dataKey="max_pressure" name="Max Pressure" stroke="#ff7300" dot={false} />
-          <Line type="monotone" dataKey="avg_pressure" name="Avg Pressure" stroke="#83BBF5" dot={false} />
-          <Line type="monotone" dataKey="min_pressure" name="Min Pressure" stroke="#228B22" dot={false} />
+          <Line type="monotone" dataKey="avg_pressure" name="Avg Pressure" stroke="#228B22" dot={false} />
+          <Line type="monotone" dataKey="min_pressure" name="Min Pressure" stroke="#83BBF5" dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
