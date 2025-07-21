@@ -11,6 +11,11 @@ import RainChart        from './components/RainChart'
 import WindChart        from './components/WindChart'
 import TempChart        from './components/TempChart'
 import PressureChart    from './components/PressureChart'
+import DailyTempChart   from './components/DailyTempChart'
+import DailyWindChart   from './components/DailyWindChart'
+import DailyRainChart   from './components/DailyRainChart'
+import DailyPressureChart from './components/DailyPressureChart'
+import UpdateIndicator  from './components/UpdateIndicator'
 
 // NOAA Wind Chill Index
 function windChill(T, vKmh) {
@@ -27,6 +32,7 @@ export default function Weather() {
   const [data, setData]   = useState(null)
   const [stats, setStats] = useState({ low: null, high: null, current: null })
   const [error, setError] = useState(null)
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     let isMounted = true
@@ -44,6 +50,7 @@ export default function Weather() {
         if (isMounted) {
           setData(currentJson)
           setStats(statsJson)
+          setLastUpdated(Date.now());
         }
       } catch (err) {
         if (isMounted) setError(err.toString())
@@ -51,7 +58,7 @@ export default function Weather() {
     }
 
     fetchData()
-    const id = setInterval(fetchData, 60 * 1000)
+    const id = setInterval(fetchData, 5000)  // Update every 5 seconds
     return () => {
       isMounted = false
       clearInterval(id)
@@ -106,7 +113,10 @@ export default function Weather() {
 
   return (
     <div className="min-h-screen bg-brand-dark text-white p-6">
-      <Link to="/" className="text-brand-accent hover:underline">&larr; Back</Link>
+      <div className="flex justify-between items-center">
+        <Link to="/" className="text-brand-accent hover:underline">← Back</Link>
+        <UpdateIndicator lastUpdated={lastUpdated} />
+      </div>
       <h1 className="text-3xl font-bold my-4">Harestua Weather Dashboard</h1>
 
       {/* Gauges & Bars */}
@@ -159,6 +169,14 @@ export default function Weather() {
         <WindChart />
         <TempChart />
         <PressureChart />
+      </div>
+
+      {/* Daily Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <DailyTempChart />
+        <DailyWindChart />
+        <DailyRainChart />
+        <DailyPressureChart />
       </div>
     </div>
   )
