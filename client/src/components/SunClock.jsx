@@ -54,7 +54,7 @@ export default function SunClock({ sunrise = '06:00', sunset = '18:00' }) {
     }
 
     update();
-    const id = setInterval(update, 300000);
+    const id = setInterval(update, 60000);  // Update every minute
     return () => clearInterval(id);
   }, [sunrise, sunset]);
 

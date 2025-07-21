@@ -14,8 +14,8 @@ export default function UpdateIndicator({ lastUpdated }) {
     return () => clearInterval(interval);
   }, [lastUpdated]);
 
-  // Color: green (rgb(34,139,34)) to gray (rgb(128,128,128)) over 60 seconds
-  const freshness = Math.max(0, 1 - (elapsed / 60));
+  // Color: green (rgb(34,139,34)) to gray (rgb(128,128,128)) over 10 seconds (faster graying)
+  const freshness = Math.max(0, 1 - (elapsed / 10));
   const r = Math.round(34 + (128 - 34) * (1 - freshness));
   const g = Math.round(139 + (128 - 139) * (1 - freshness));
   const b = Math.round(34 + (128 - 34) * (1 - freshness));

@@ -8,9 +8,9 @@ import { parseRaw } from '../utils/parseRaw.js'
 
 const router = Router()
 
-// fire off the first poll immediately, then once a minute
+// fire off the first poll immediately, then every 5 second.
 pollWeather()
-setInterval(pollWeather, 60_000)
+setInterval(pollWeather, 5_000)
 
 // ── current ───────────────────────────────────────────────────────────────
 router.get('/current', (_req, res) => {

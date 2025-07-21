@@ -1,4 +1,3 @@
-// client/src/Weather.jsx
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SunCalc from 'suncalc'
@@ -59,7 +58,7 @@ export default function Weather() {
     }
 
     fetchData()
-    const id = setInterval(fetchData, 60 * 1000)
+    const id = setInterval(fetchData, 5000)  // Update every 5 seconds
     return () => {
       isMounted = false
       clearInterval(id)
