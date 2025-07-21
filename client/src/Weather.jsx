@@ -1,3 +1,4 @@
+// client/src/Weather.jsx
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SunCalc from 'suncalc'
@@ -15,6 +16,7 @@ import DailyTempChart   from './components/DailyTempChart'
 import DailyWindChart   from './components/DailyWindChart'
 import DailyRainChart   from './components/DailyRainChart'
 import DailyPressureChart from './components/DailyPressureChart'
+import UpdateIndicator  from './components/UpdateIndicator'
 
 // NOAA Wind Chill Index
 function windChill(T, vKmh) {
@@ -31,6 +33,7 @@ export default function Weather() {
   const [data, setData]   = useState(null)
   const [stats, setStats] = useState({ low: null, high: null, current: null })
   const [error, setError] = useState(null)
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     let isMounted = true
@@ -48,6 +51,7 @@ export default function Weather() {
         if (isMounted) {
           setData(currentJson)
           setStats(statsJson)
+          setLastUpdated(Date.now());
         }
       } catch (err) {
         if (isMounted) setError(err.toString())
@@ -110,7 +114,10 @@ export default function Weather() {
 
   return (
     <div className="min-h-screen bg-brand-dark text-white p-6">
-      <Link to="/" className="text-brand-accent hover:underline">← Back</Link>
+      <div className="flex justify-between items-center">
+        <Link to="/" className="text-brand-accent hover:underline">← Back</Link>
+        <UpdateIndicator lastUpdated={lastUpdated} />
+      </div>
       <h1 className="text-3xl font-bold my-4">Harestua Weather Dashboard</h1>
 
       {/* Gauges & Bars */}
