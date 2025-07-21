@@ -1,4 +1,3 @@
-// client/src/Weather.jsx
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SunCalc from 'suncalc'
@@ -12,32 +11,6 @@ import RainChart        from './components/RainChart'
 import WindChart        from './components/WindChart'
 import TempChart        from './components/TempChart'
 import PressureChart    from './components/PressureChart'
-
-function safeFloat(value) {
-  const n = parseFloat(value)
-  return Number.isNaN(n) ? null : n
-}
-
-function parse(raw) {
-  const parts = raw.trim().split(/\s+/)
-  const data  = {}
-
-  // Wind & Temperature & Other fields
-  data.windAvg       = safeFloat(parts[158])      // avg wind / 10 min
-  data.windCurrent   = safeFloat(parts[2])        // current windspeed
-  data.windDir       = safeFloat(parts[3])        // wind direction
-  data.temperature   = safeFloat(parts[4])      // outside temp
-  data.dewPoint      = safeFloat(parts[72])     // dew point
-  data.uvIndex       = safeFloat(parts[79])      // raw UV
-  data.solar         = safeFloat(parts[127])      // global solar radiation
-
-  // New rain fields
-  data.dayRain       = safeFloat(parts[7])      // mm since 00:00 local
-  data.yesterdayRain  = safeFloat(parts[10])     // mm in last 60 minutes
-  data.rainRate10min = safeFloat(parts[10])     // mm/hr over last 10 minutes
-
-  return data
-}
 
 // NOAA Wind Chill Index
 function windChill(T, vKmh) {
@@ -60,40 +33,16 @@ export default function Weather() {
 
     async function fetchData() {
       try {
-        // 1) Fetch today's stats (always required)
+        const currentRes = await fetch('/api/weather/current')
+        if (!currentRes.ok) throw new Error(`Current status ${currentRes.status}`)
+        const currentJson = await currentRes.json()
+
         const statsRes = await fetch('/api/weather/stats')
         if (!statsRes.ok) throw new Error(`Stats status ${statsRes.status}`)
         const statsJson = await statsRes.json()
 
-        // 2) Try raw fetch, fallback to stats-only
-        let parsed = {
-          windAvg:       null,
-          windCurrent:   null,
-          windDir:       null,
-          temperature:   statsJson.current,
-          dewPoint:      null,
-          uvIndex:       null,
-          solar:         null,
-          dayRain:       null,
-          yesterdayRain:  null,
-          rainRate10min: null,
-        }
-        try {
-          const rawRes = await fetch('/api/weather/raw')
-          if (rawRes.ok) {
-            const rawText = await rawRes.text()
-            parsed = parse(rawText)
-          }
-        } catch (rawErr) {
-          console.warn('Raw fetch failed, using stats-only', rawErr)
-        }
-
-        // 3) Override extremes from the DB
-        parsed.low  = statsJson.low
-        parsed.high = statsJson.high
-
         if (isMounted) {
-          setData(parsed)
+          setData(currentJson)
           setStats(statsJson)
         }
       } catch (err) {
@@ -102,7 +51,7 @@ export default function Weather() {
     }
 
     fetchData()
-    const id = setInterval(fetchData, 2 * 1000) // every minute
+    const id = setInterval(fetchData, 60 * 1000)
     return () => {
       isMounted = false
       clearInterval(id)
@@ -112,26 +61,24 @@ export default function Weather() {
   if (error) return <div className="p-8 text-red-400">Error loading: {error}</div>
   if (!data)  return <p className="text-center mt-8">Loading weather…</p>
 
-  // Display values & feels
   const displayLow  = stats.low  != null ? stats.low  : '--'
   const displayHigh = stats.high != null ? stats.high : '--'
 
-  // <-- Updated fallback here: if data.temperature is null, use stats.current -->
-  const currTemp = data.temperature != null
-    ? data.temperature
+  const currTemp = data.out_temp != null
+    ? data.out_temp
     : stats.current != null
     ? stats.current
     : '--'
 
-  const vKmh = data.windCurrent != null ? data.windCurrent * 3.6 : null
+  const vKmh = data.current_windspeed != null ? data.current_windspeed * 3.6 : null
 
   const feelsLow     = stats.low  != null && vKmh != null
     ? windChill(stats.low,   vKmh)
     : '--'
   const feelsCurrent =
-    (data.temperature != null || stats.current != null) && vKmh != null
+    (data.out_temp != null || stats.current != null) && vKmh != null
       ? windChill(
-          data.temperature != null ? data.temperature : stats.current,
+          data.out_temp != null ? data.out_temp : stats.current,
           vKmh
         )
       : '--'
@@ -152,11 +99,10 @@ export default function Weather() {
   })
 
   // Rain values
-  const dayRainValue      = data.dayRain != null ? data.dayRain : null
-  const rainRate10Value   = data.rainRate10min != null ? data.rainRate10min : null
-  const yesterdayRainValue = data.yesterdayRain != null ? data.yesterdayRain : null
-  const rainLast24hValue  = data.rainLast24h != null ? data.rainLast24h : null
-  const uvIndex_raw       = data.uvIndex != null ? data.uvIndex : null
+  const dayRainValue      = data.day_rain ?? null
+  const rainRate10Value   = data.rain_rate_mm_min ?? null
+  const yesterdayRainValue = data.yesterday_rain ?? null
+  const uvIndex_raw       = data.uv_index ?? null
 
   return (
     <div className="min-h-screen bg-brand-dark text-white p-6">
@@ -174,15 +120,15 @@ export default function Weather() {
           feelsCurrent={feelsCurrent}
         />
         <Compass
-          current={data.windCurrent}
-          average={data.windAvg}
-          direction={data.windDir}
+          current={data.current_windspeed}
+          average={data.avg_wind_10min}  // Updated to use avg_wind_10min (was windAvg)
+          direction={data.wind_dir}
         />
         <VerticalBars data={{
-          windCurrent: data.windCurrent,
-          windAvg:     data.windAvg,
-          uvIndex:     data.uvIndex,
-          solarReading:data.solar
+          windCurrent: data.current_windspeed,
+          windAvg:     data.avg_wind_10min,  // Updated
+          uvIndex:     data.uv_index,
+          solarReading:data.vp_solar_wm2
         }} />
       </div>
 
