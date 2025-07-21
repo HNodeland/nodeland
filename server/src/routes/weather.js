@@ -110,4 +110,112 @@ router.get('/raw', async (_req, res) => {
   }
 })
 
+// ── daily-temp ────────────────────────────────────────────────────────────
+router.get('/daily-temp', async (req, res) => {
+  const days = parseInt(req.query.days) || 30;
+  const limit = Math.min(days, 365);  // Cap at 365 days
+  try {
+    const [rows] = await pool.execute(
+      `
+      SELECT 
+        m.\`date\`,
+        m.max_out_temp AS max_temp,
+        a.avg_out_temp AS avg_temp,
+        n.min_out_temp AS min_temp
+      FROM weather_daily_max m
+      JOIN weather_daily_avg a ON m.\`date\` = a.\`date\`
+      JOIN weather_daily_min n ON m.\`date\` = n.\`date\`
+      ORDER BY m.\`date\` DESC
+      LIMIT ?
+      `,
+      [limit]
+    );
+    res.json(rows.reverse());  // Reverse to chronological order
+  } catch (err) {
+    console.error('Error fetching daily temp stats:', err);
+    res.status(500).json({ error: 'Server error fetching daily temp stats' });
+  }
+});
+
+// ── daily-wind ────────────────────────────────────────────────────────────
+router.get('/daily-wind', async (req, res) => {
+  const days = parseInt(req.query.days) || 30;
+  const limit = Math.min(days, 365);
+  try {
+    const [rows] = await pool.execute(
+      `
+      SELECT 
+        m.\`date\`,
+        m.max_current_windspeed AS max_wind,
+        a.avg_current_windspeed AS avg_wind,
+        n.min_current_windspeed AS min_wind
+      FROM weather_daily_max m
+      JOIN weather_daily_avg a ON m.\`date\` = a.\`date\`
+      JOIN weather_daily_min n ON m.\`date\` = n.\`date\`
+      ORDER BY m.\`date\` DESC
+      LIMIT ?
+      `,
+      [limit]
+    );
+    res.json(rows.reverse());
+  } catch (err) {
+    console.error('Error fetching daily wind stats:', err);
+    res.status(500).json({ error: 'Server error fetching daily wind stats' });
+  }
+});
+
+// ── daily-rain ────────────────────────────────────────────────────────────
+router.get('/daily-rain', async (req, res) => {
+  const days = parseInt(req.query.days) || 30;
+  const limit = Math.min(days, 365);
+  try {
+    const [rows] = await pool.execute(
+      `
+      SELECT 
+        m.\`date\`,
+        m.max_day_rain AS max_rain,
+        a.avg_day_rain AS avg_rain,
+        n.min_day_rain AS min_rain
+      FROM weather_daily_max m
+      JOIN weather_daily_avg a ON m.\`date\` = a.\`date\`
+      JOIN weather_daily_min n ON m.\`date\` = n.\`date\`
+      ORDER BY m.\`date\` DESC
+      LIMIT ?
+      `,
+      [limit]
+    );
+    res.json(rows.reverse());
+  } catch (err) {
+    console.error('Error fetching daily rain stats:', err);
+    res.status(500).json({ error: 'Server error fetching daily rain stats' });
+  }
+});
+
+// ── daily-pressure ────────────────────────────────────────────────────────
+router.get('/daily-pressure', async (req, res) => {
+  const days = parseInt(req.query.days) || 30;
+  const limit = Math.min(days, 365);
+  try {
+    const [rows] = await pool.execute(
+      `
+      SELECT 
+        m.\`date\`,
+        m.max_barometer AS max_pressure,
+        a.avg_barometer AS avg_pressure,
+        n.min_barometer AS min_pressure
+      FROM weather_daily_max m
+      JOIN weather_daily_avg a ON m.\`date\` = a.\`date\`
+      JOIN weather_daily_min n ON m.\`date\` = n.\`date\`
+      ORDER BY m.\`date\` DESC
+      LIMIT ?
+      `,
+      [limit]
+    );
+    res.json(rows.reverse());
+  } catch (err) {
+    console.error('Error fetching daily pressure stats:', err);
+    res.status(500).json({ error: 'Server error fetching daily pressure stats' });
+  }
+});
+
 export default router

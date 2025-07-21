@@ -11,6 +11,10 @@ import RainChart        from './components/RainChart'
 import WindChart        from './components/WindChart'
 import TempChart        from './components/TempChart'
 import PressureChart    from './components/PressureChart'
+import DailyTempChart   from './components/DailyTempChart'
+import DailyWindChart   from './components/DailyWindChart'
+import DailyRainChart   from './components/DailyRainChart'
+import DailyPressureChart from './components/DailyPressureChart'
 
 // NOAA Wind Chill Index
 function windChill(T, vKmh) {
@@ -106,7 +110,7 @@ export default function Weather() {
 
   return (
     <div className="min-h-screen bg-brand-dark text-white p-6">
-      <Link to="/" className="text-brand-accent hover:underline">&larr; Back</Link>
+      <Link to="/" className="text-brand-accent hover:underline">← Back</Link>
       <h1 className="text-3xl font-bold my-4">Harestua Weather Dashboard</h1>
 
       {/* Gauges & Bars */}
@@ -159,6 +163,14 @@ export default function Weather() {
         <WindChart />
         <TempChart />
         <PressureChart />
+      </div>
+
+      {/* Daily Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <DailyTempChart />
+        <DailyWindChart />
+        <DailyRainChart />
+        <DailyPressureChart />
       </div>
     </div>
   )
