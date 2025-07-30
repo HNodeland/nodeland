@@ -32,6 +32,7 @@ cd "$ROOT_DIR"
     "-x!./prompt_creator.py" \
     "-x!./readme.md" \
     "-xr!docs\*" \
-    "-x!./build_and_package.sh"
+    "-x!./build_and_package.sh" \
+    "-x!./docker-compose.yml" \
 
 echo "Done. Archive created: $(basename "$ZIP_PATH")"

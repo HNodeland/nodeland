@@ -11,7 +11,7 @@ export default function RainGauge({
 
 
   // Constants
-  const maxRain = 150 // mm capacity
+  const maxRain = 60 // mm capacity
 
   // Bucket outer coordinates
   const bucketTopY = 20

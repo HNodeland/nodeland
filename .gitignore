@@ -44,8 +44,8 @@ docker-compose.override.yml
 .DS_Store
 
 /server/.env
-
-
+/assets/
+index.html
 prompt.txt
 
 *.zip
