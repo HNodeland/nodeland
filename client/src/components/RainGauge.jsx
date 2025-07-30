@@ -1,4 +1,3 @@
-// client/src/components/RainGauge.jsx
 import React, { useMemo } from 'react'
 
 export default function RainGauge({
@@ -7,9 +6,6 @@ export default function RainGauge({
   yesterdayRain = 0,
   vp_solar_wm2 = 0,
 }) {
-  // Convert raw UV to UVI
-
-
   // Constants
   const maxRain = 60 // mm capacity
 
@@ -75,19 +71,19 @@ export default function RainGauge({
 
   return (
     <div className="w-full px-4">
-      <h2 className="text-center text-lg font-semibold mb-4 text-white">
+      <h2 className="text-center text-base sm:text-lg font-semibold mb-2 text-white">
         Rain Meter
       </h2>
 
-      <div className="flex items-center justify-center space-x-11 overflow-x-auto">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 sm:gap-x-4">
         {/* Left: Today's Rain */}
-        <div className="ml-[15px] flex flex-col items-center text-white space-y-1 shrink-0">
-          <p className="text-3xl font-semibold">{dayRainStr}</p>
-          <p className="text-base">Today's Rain</p>
+        <div className="flex flex-col items-end text-white space-y-1 shrink-0">
+          <p className="text-xl sm:text-3xl font-semibold">{dayRainStr}</p>
+          <p className="text-xs sm:text-base">Today's Rain</p>
         </div>
 
         {/* Center: Bucket + Sun/Cloud */}
-        <div className="w-20 sm:w-24 flex-shrink-0">
+        <div className="w-[25vw] min-w-16 max-w-24 flex-shrink-0">
           <svg
             width="100%"
             height="auto"
@@ -302,14 +298,14 @@ export default function RainGauge({
         </div>
 
         {/* Right: Stats (left-aligned) */}
-        <div className="flex-shrink-0 flex flex-col items-start text-white text-xs space-y-2">
+        <div className="flex-shrink-0 flex flex-col items-start text-white space-y-1 sm:space-y-2">
           <div>
-            <p className="text-sm font-semibold">{rainRateHourStr}</p>
-            <p className="opacity-80">Current Rainfall</p>
+            <p className="text-xs sm:text-sm font-semibold">{rainRateHourStr}</p>
+            <p className="opacity-80 text-xs">Current Rainfall</p>
           </div>
           <div>
-            <p className="text-sm font-semibold">{yesterdayRainStr}</p>
-            <p className="opacity-80">Rain in the past Hour</p>
+            <p className="text-xs sm:text-sm font-semibold">{yesterdayRainStr}</p>
+            <p className="opacity-80 text-xs">Rain in the past Hour</p>
           </div>
         </div>
       </div>
