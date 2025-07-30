@@ -12,10 +12,11 @@ echo "Building client..."
 cd "$CLIENT_DIR"
 npm run build
 
-# 2) Copy build artifacts to root
-echo "Copying build output to root (overwriting existing files if needed)..."
+# 2) Copy build artifacts to public/ (create if needed, overwriting existing files)
+echo "Copying build output to public/ (overwriting existing files if needed)..."
 cd "$ROOT_DIR"
-cp -a "$BUILD_DIR"/. "$ROOT_DIR"/
+mkdir -p public
+cp -a "$BUILD_DIR"/. public/
 rm -rf "$BUILD_DIR"
 
 # 3) Create zip archive, excluding specified files and folders

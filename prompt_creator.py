@@ -7,7 +7,9 @@ import os
 from pathlib import Path
 
 # Names of files or directories to skip entirely
-SKIP_NAMES = {"node_modules", "package-lock.json"}
+SKIP_NAMES = {"node_modules", "package-lock.json", ".gitignore", "assets", ".git", "db.env", "db.env.example",
+              "prompt.txt", "prompt_creator.py", "README.md", "docker-compose.dev.yml", "docs", ".env",
+              ".env.example", "Dockerfile"}
 
 
 def write_files_in_dir(base_dir: Path, out_file):
@@ -49,8 +51,9 @@ def main():
     output_path = script_dir / "prompt.txt"
 
     with output_path.open("w", encoding="utf-8") as out:
-        write_files_in_dir(server_dir, out)
-        write_files_in_dir(client_dir, out)
+        # write_files_in_dir(server_dir, out)
+        # write_files_in_dir(client_dir, out)
+        write_files_in_dir(script_dir, out)
 
     print(f"Written all filenames and contents to {output_path}")
 
