@@ -27,6 +27,7 @@ test -f "$ZIP_PATH" && rm -f "$ZIP_PATH"
 cd "$ROOT_DIR"
 "/c/Program Files/7-Zip/7z.exe" a -tzip "$ZIP_PATH" \
     ./* \
+    "./.htaccess" \
     "-x!./.gitignore" \
     "-x!./db.env.example" \
     "-x!./prompt.txt" \
@@ -34,6 +35,6 @@ cd "$ROOT_DIR"
     "-x!./readme.md" \
     "-xr!docs\*" \
     "-x!./build_and_package.sh" \
-    "-x!./docker-compose.yml" \
+    "-x!./docker-compose.dev.yml" \
 
 echo "Done. Archive created: $(basename "$ZIP_PATH")"

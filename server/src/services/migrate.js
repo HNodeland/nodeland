@@ -1,3 +1,4 @@
+// server/src/services/migrate.js
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -41,47 +42,42 @@ export default async function migrate() {
   );
   await pool.query(statsSql);
 
-  // ── 003: weather_readings table ──────────────────
-  const readingsSql = fs.readFileSync(
-    path.join(migrationsDir, '003_create_weather_readings_table.sql'),
-    'utf8'
-  );
-  await pool.query(readingsSql);
 
-  // ── 004: expand weather_readings ─────────────────
+  // ── 003: expand weather_readings ─────────────────
   const expandedReadingsSql = fs.readFileSync(
-    path.join(migrationsDir, '004_expand_weather_readings.sql'),
+    path.join(migrationsDir, '003_expand_weather_readings.sql'),
     'utf8'
   );
   await pool.query(expandedReadingsSql);
 
-  // ── 005: create weather_daily_max ────────────────
+  // ── 004: create weather_daily_max ────────────────
   const dailyMaxSql = fs.readFileSync(
-    path.join(migrationsDir, '005_create_weather_daily_max.sql'),
+    path.join(migrationsDir, '004_create_weather_daily_max.sql'),
     'utf8'
   );
   await pool.query(dailyMaxSql);
 
-  // ── 007: create weather_daily_min ────────────────
+  // ── 005: create weather_daily_min ────────────────
   const dailyMinSql = fs.readFileSync(
-    path.join(migrationsDir, '007_create_weather_daily_min.sql'),
+    path.join(migrationsDir, '005_create_weather_daily_min.sql'),
     'utf8'
   );
   await pool.query(dailyMinSql);
 
-  // ── 008: create weather_daily_avg ────────────────
+  // ── 006: create weather_daily_avg ────────────────
   const dailyAvgSql = fs.readFileSync(
-    path.join(migrationsDir, '008_create_weather_daily_avg.sql'),
+    path.join(migrationsDir, '006_create_weather_daily_avg.sql'),
     'utf8'
   );
   await pool.query(dailyAvgSql);
 
-  // ── 009: update daily wipe event ─────────────────
-  const eventSql = fs.readFileSync(
-    path.join(migrationsDir, '009_update_daily_wipe_event.sql'),
+  // ── 007: create daily weather summary procedure ────────────────
+  const dailySummarySql = fs.readFileSync(
+    path.join(migrationsDir, '007_create_daily_weather_summary_procedure.sql'),
     'utf8'
   );
-  await pool.query(eventSql);
+  await pool.query(dailySummarySql);
+
 
   console.log('✅ All migrations applied');
 }
