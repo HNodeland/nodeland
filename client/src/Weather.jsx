@@ -135,7 +135,7 @@ export default function Weather() {
           average={data.avg_wind_10min}  // Updated to use avg_wind_10min (was windAvg)
           direction={data.wind_dir}
         />
-        <WindFlag  />
+        <WindFlag current={data.current_windspeed} />
       </div>
 
       {/* SunClock & RainGauge row */}
