@@ -2,6 +2,7 @@
 FROM node:18-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
+RUN npm install
 RUN npm ci
 
 # 2. Final stage: copy code & run

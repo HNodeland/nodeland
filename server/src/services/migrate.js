@@ -43,12 +43,12 @@ export default async function migrate() {
   await pool.query(statsSql);
 
 
-  // ── 003: expand weather_readings ─────────────────
-  const expandedReadingsSql = fs.readFileSync(
-    path.join(migrationsDir, '003_expand_weather_readings.sql'),
+  // ── 003: create weather_readings ─────────────────
+  const dailyReadingSql = fs.readFileSync(
+    path.join(migrationsDir, '003_create_weather_readings.sql'),
     'utf8'
   );
-  await pool.query(expandedReadingsSql);
+  await pool.query(dailyReadingSql);
 
   // ── 004: create weather_daily_max ────────────────
   const dailyMaxSql = fs.readFileSync(
