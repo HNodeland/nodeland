@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
+import { mmToIn } from '../utils/conversions'
 
 export default function RainGauge({
   dayRain = 0,
@@ -7,7 +8,18 @@ export default function RainGauge({
   vp_solar_wm2 = 0,
 }) {
   // Constants
-  const maxRain = 60 // mm capacity
+  const [unit, setUnit] = useState('mm')
+  const toggleUnit = () => setUnit(u => u === 'mm' ? 'in' : 'mm')
+
+  const maxRainMm = 60 // mm capacity
+  const maxRain = unit === 'mm' ? maxRainMm : mmToIn(maxRainMm)
+
+  const convert = (val) => (typeof val === 'number') ? (unit === 'mm' ? val : mmToIn(val)) : 0
+
+  const dayRainConverted = convert(dayRain)
+  const yesterdayRainConverted = convert(yesterdayRain)
+  const rainRate10minConverted = convert(rainRate10min)
+  const rainRateHourConverted = rainRate10minConverted * 60 // to /hr
 
   // Bucket outer coordinates
   const bucketTopY = 20
@@ -26,7 +38,7 @@ export default function RainGauge({
   const innerBottomY = bucketBottomY - 3   // 117
 
   // Calculate water fill height (0–maxRain mapped to 0–bucketHeight)
-  const percent = Math.min(dayRain / maxRain, 1)
+  const percent = Math.min(dayRainConverted / maxRain, 1)
   const bucketHeight = innerBottomY - innerTopY // 94
   const waterHeight = bucketHeight * percent
   const waterY = innerBottomY - waterHeight
@@ -60,17 +72,23 @@ export default function RainGauge({
   )
 
   // Format numbers (two decimals)
-  const fmt2 = (val, unit) => (val != null ? `${val.toFixed(2)} ${unit}` : '--')
-  const dayRainStr = `${dayRain.toFixed(2)}mm`
-  const rainRateHourStr = fmt2(rainRate10min, 'mm/hr')
-  const yesterdayRainStr = fmt2(yesterdayRain, 'mm')
+  const fmt2 = (val, unitStr) => (typeof val === 'number' ? `${val.toFixed(2)} ${unitStr}` : '--')
+  const dayRainStr = fmt2(dayRainConverted, unit)
+  const rainRateUnit = unit === 'mm' ? 'mm/hr' : 'in/hr'
+  const rainRateHourStr = fmt2(rainRateHourConverted, rainRateUnit)
+  const yesterdayRainStr = fmt2(yesterdayRainConverted, unit)
 
   // Determine whether to show cloud or sun based solely on current rain rate and UV index
   const showCloud = rainRate10min <= 0 && vp_solar_wm2 <= 500
   const showSun = rainRate10min <= 0 && vp_solar_wm2 > 500
 
   return (
-    <div className="w-full px-4">
+    <div className="w-full px-4 relative cursor-pointer" onClick={toggleUnit}>
+      <div 
+        className="absolute top-[-4px] left-2 w-8 h-8 rounded-full bg-brand-mid text-white flex items-center justify-center text-base font-bold"
+      >
+        {unit}
+      </div>
       <h2 className="text-center text-base sm:text-lg font-semibold mb-2 text-white">
         Rain Meter
       </h2>
