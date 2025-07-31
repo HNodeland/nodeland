@@ -1,7 +1,8 @@
 // client/src/components/TemperatureGauge.jsx
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { cToF } from '../utils/conversions'
 
 // Displays a horizontal temperature scale and key statistics
 export default function TemperatureGauge({
@@ -13,23 +14,34 @@ export default function TemperatureGauge({
   feelsCurrent = '--',
 }) {
   const { t } = useTranslation()
+  const [unit, setUnit] = useState('C')
+  const toggleUnit = () => setUnit(u => u === 'C' ? 'F' : 'C')
 
   // Helper to format a value to one decimal, or pass through placeholders
   const fmt = v => (typeof v === 'number' ? v.toFixed(1) : v)
 
+  const convert = v => unit === 'C' ? v : cToF(v)
+
   // prepare formatted strings
-  const lowStr     = fmt(low)
-  const currentStr = fmt(current)
-  const highStr    = fmt(high)
-  const feelsLowStr     = fmt(feelsLow)
-  const feelsCurrentStr = fmt(feelsCurrent)
-  const feelsHighStr    = fmt(feelsHigh)
+  const lowStr     = fmt(convert(low))
+  const currentStr = fmt(convert(current))
+  const highStr    = fmt(convert(high))
+  const feelsLowStr     = fmt(convert(feelsLow))
+  const feelsCurrentStr = fmt(convert(feelsCurrent))
+  const feelsHighStr    = fmt(convert(feelsHigh))
 
   // compute current position percentage for pointer
-  const currentNum = typeof current === 'number' ? current : parseFloat(current)
+  let currentNum = typeof current === 'number' ? current : parseFloat(current)
+  let minRange = -30
+  let maxRange = 30
+  if (unit === 'F') {
+    currentNum = convert(currentNum)
+    minRange = convert(-30)
+    maxRange = convert(30)
+  }
   const posPct = isNaN(currentNum)
     ? 50
-    : ((currentNum + 30) / 60) * 100
+    : ((currentNum - minRange) / (maxRange - minRange)) * 100
 
   // derive pointer color from gradient
   let pointerColor = '#fff'
@@ -51,11 +63,18 @@ export default function TemperatureGauge({
   const height = (side * Math.sqrt(3)) / 2  // ~13.86
 
   return (
-    <div className="max-h-[300px] h-full w-full bg-brand-deep p-4 rounded-lg shadow-md overflow-hidden">
-      {/* Title */}
-      <h4 className="text-center text-lg font-semibold mb-4 text-white">
-        {t('temperatureGauge.title')}
-      </h4>
+    <div className="max-h-[300px] h-full w-full bg-brand-deep p-4 rounded-lg shadow-md overflow-hidden cursor-pointer" onClick={toggleUnit}>
+      {/* Header with title and unit circle */}
+      <div className="flex items-center justify-center mb-4 relative">
+        <h4 className="text-lg font-semibold text-white">
+          {t('temperatureGauge.title').slice(0, -4)} (°{unit})
+        </h4>
+        <div 
+          className="absolute left-0 w-8 h-8 rounded-full bg-brand-mid text-white flex items-center justify-center text-lg font-bold"
+        >
+          °{unit}
+        </div>
+      </div>
 
       {/* Gauge & pointer */}
       <div className="relative -top-[50px]">
@@ -88,11 +107,12 @@ export default function TemperatureGauge({
           />
 
           {/* tick marks and labels */}
-          {Array.from({ length: 61 }, (_, i) => i - 30).map(deg => {
-            const pct = ((deg + 30) / 60) * 100
-            const tickH = deg % 10 === 0 ? 48 : deg % 5 === 0 ? 24 : 6
+          {Array.from({ length: 61 }, (_, i) => i - 30).map(degC => {
+            const deg = unit === 'C' ? degC : convert(degC)
+            const pct = ((degC + 30) / 60) * 100
+            const tickH = degC % 10 === 0 ? 48 : degC % 5 === 0 ? 24 : 6
             return (
-              <React.Fragment key={deg}>
+              <React.Fragment key={degC}>
                 <div
                   className="absolute bg-white"
                   style={{
@@ -103,7 +123,7 @@ export default function TemperatureGauge({
                     transform: 'translateX(-0.5px)',
                   }}
                 />
-                {deg % 10 === 0 && (
+                {degC % 10 === 0 && (
                   <span
                     className="absolute text-xs text-white"
                     style={{
@@ -112,7 +132,7 @@ export default function TemperatureGauge({
                       transform: 'translateX(-50%)',
                     }}
                   >
-                    {deg}
+                    {unit === 'C' ? deg : Math.round(deg)}
                   </span>
                 )}
               </React.Fragment>
@@ -123,19 +143,19 @@ export default function TemperatureGauge({
         {/* Main stats */}
         <div className="mt-12 grid grid-cols-3 text-center gap-x-4">
           <div>
-            <div className="text-2xl font-bold text-white">{lowStr}°C</div>
+            <div className="text-2xl font-bold text-white">{lowStr}°{unit}</div>
             <div className="text-xs text-brand-light mt-1">
               {t('temperatureGauge.stats.low')}
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-white">{currentStr}°C</div>
+            <div className="text-2xl font-bold text-white">{currentStr}°{unit}</div>
             <div className="text-xs text-brand-light mt-1">
               {t('temperatureGauge.stats.current')}
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-white">{highStr}°C</div>
+            <div className="text-2xl font-bold text-white">{highStr}°{unit}</div>
             <div className="text-xs text-brand-light mt-1">
               {t('temperatureGauge.stats.high')}
             </div>
@@ -146,7 +166,7 @@ export default function TemperatureGauge({
         <div className="mt-4 grid grid-cols-3 text-center gap-x-4">
           <div>
             <div className="text-lg font-semibold text-brand-mid">
-              {feelsLowStr}°C
+              {feelsLowStr}°{unit}
             </div>
             <div className="text-[10px] text-brand-light mt-1">
               {t('temperatureGauge.feels.low')}
@@ -154,7 +174,7 @@ export default function TemperatureGauge({
           </div>
           <div>
             <div className="text-lg font-semibold text-brand-mid">
-              {feelsCurrentStr}°C
+              {feelsCurrentStr}°{unit}
             </div>
             <div className="text-[10px] text-brand-light mt-1">
               {t('temperatureGauge.feels.current')}
@@ -162,7 +182,7 @@ export default function TemperatureGauge({
           </div>
           <div>
             <div className="text-lg font-semibold text-brand-mid">
-              {feelsHighStr}°C
+              {feelsHighStr}°{unit}
             </div>
             <div className="text-[10px] text-brand-light mt-1">
               {t('temperatureGauge.feels.high')}
