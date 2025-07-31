@@ -13,7 +13,69 @@ const conversions = {
 
 const lerp = (a, b, t) => a + (b - a) * t;
 
-export default function WindFlag({ current }) {
+function VerticalBar({
+  valueKnots,
+  selectedUnit,
+  max = 15,
+  label,
+  width = 75,
+  barBackground = 'rgba(105, 112, 117, 1)',
+  fillColor = '#2a7bc1ff',
+}) {
+  const clamped = Math.min(Math.max(valueKnots ?? 0, 0), max);
+  const normalized = clamped / max;
+  const displayValue = `${conversions[selectedUnit](valueKnots)} ${unitLabels[selectedUnit]}`;
+
+  return (
+    <div
+      className="relative flex flex-col items-center text-white"
+      style={{ width: width, height: 220 }}
+      aria-label={`${label}: ${displayValue}`}
+    >
+      <div className="relative flex-1 w-full rounded-md overflow-hidden flex flex-col justify-end">
+        <div
+          style={{
+            backgroundColor: barBackground,
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 6,
+          }}
+        />
+        <div
+          style={{
+            height: `${normalized * 100}%`,
+            transition: 'height 0.2s ease',
+            backgroundColor: fillColor,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 10,
+            fontWeight: 600,
+            position: 'relative',
+            borderRadius: 6,
+          }}
+        >
+          <div
+            className="truncate"
+            style={{
+              padding: '0 2px',
+              lineHeight: 1,
+              pointerEvents: 'none',
+              textAlign: 'center',
+            }}
+          >
+            {displayValue}
+          </div>
+        </div>
+      </div>
+      <div className="mt-1 text-xs text-center" style={{ fontWeight: 600 }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+export default function WindFlag({ current, avg }) {
   const { t } = useTranslation();
   const [selectedUnit, setSelectedUnit] = useState('kts');
 
@@ -28,6 +90,17 @@ export default function WindFlag({ current }) {
     return () => clearInterval(id);
   }, []);
 
+  // Demo fallback for avg if not provided
+  const [demoAvgKnots, setDemoAvgKnots] = useState(5);
+  useEffect(() => {
+    let a = 5;
+    const id = setInterval(() => {
+      setDemoAvgKnots(a);
+      a = a >= 10 ? 5 : a + 1;
+    }, 5000);
+    return () => clearInterval(id);
+  }, []);
+
   // Raw and smoothed wind refs
   const rawKnotsRef = useRef(current ?? demoKnots);
   const smoothedKnotsRef = useRef(rawKnotsRef.current);
@@ -37,20 +110,18 @@ export default function WindFlag({ current }) {
     rawKnotsRef.current = current ?? demoKnots;
   }, [current, demoKnots]);
 
-  // Constants and segment setup
+  // Flag parameters
   const segments = 5;
   const initialHeight = 40;
   const taper = initialHeight / segments;
   const segLength = 40;
   const colors = ['red', 'white', 'red', 'white', 'red'];
 
-  // Derived base parameters for wiggle propagation
   const maxDelay = 0.35;
   const minDelay = 0.08;
   const baseFreq = 0.9;
   const maxFreq = 2.0;
 
-  // Erect interpolation state
   const smoothRef = useRef(Math.min(1 / 3, segments));
   const [smoothErectProgress, setSmoothErectProgress] = useState(smoothRef.current);
   const [perSegmentErect, setPerSegmentErect] = useState(
@@ -60,13 +131,11 @@ export default function WindFlag({ current }) {
   );
   const perSegmentErectRef = useRef(perSegmentErect);
 
-  // Smoothed derived wiggle drivers
   const smoothedFreqRef = useRef(baseFreq);
   const smoothedTravelDelayRef = useRef(maxDelay);
   const smoothedWindInfluenceRef = useRef(0);
   const phaseRefs = useRef(Array.from({ length: segments }, () => Math.random() * Math.PI * 2));
 
-  // Time driver
   const [time, setTime] = useState(0);
   useEffect(() => {
     let raf;
@@ -78,7 +147,7 @@ export default function WindFlag({ current }) {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Persistent animation loop: wind smoothing, erect interpolation, derived smoothing, phase advance
+  // Animation loop for flag smoothing/etc.
   useEffect(() => {
     let raf;
     let last = performance.now();
@@ -146,7 +215,7 @@ export default function WindFlag({ current }) {
       smoothedTravelDelayRef.current += (targetTravelDelay - smoothedTravelDelayRef.current) * alphaDerived;
       smoothedWindInfluenceRef.current += (targetWindInfluence - smoothedWindInfluenceRef.current) * alphaDerived;
 
-      // ---- Phase advance for continuity ----
+      // ---- Phase advance ----
       for (let i = 0; i < segments; i++) {
         phaseRefs.current[i] += 2 * Math.PI * smoothedFreqRef.current * dt;
       }
@@ -158,18 +227,15 @@ export default function WindFlag({ current }) {
     return () => cancelAnimationFrame(raf);
   }, [segments]);
 
-  // Derived values used for rendering
+  // Derived rendering values
   const knots = displayKnots;
-  const displayedSpeed = conversions[selectedUnit](knots);
   const normalizedWind = Math.min(knots, 15) / 15;
 
-  // First hanging index
   const firstHangingIndex = useMemo(() => {
     const idx = perSegmentErect.findIndex((r) => r < 0.99);
     return idx === -1 ? segments : idx;
   }, [perSegmentErect, segments]);
 
-  // Angles with continuous-phase wiggle
   const angles = useMemo(() => {
     return Array.from({ length: segments }, (_, i) => {
       const erectRatio = Math.min(Math.max(perSegmentErect[i], 0), 1);
@@ -177,7 +243,6 @@ export default function WindFlag({ current }) {
 
       if (erectRatio < 1) {
         let hangFactor = 1 - erectRatio;
-        // Optional dead zone to reduce jitter when almost fully hanging
         if (erectRatio < 0.05) hangFactor = 0;
 
         const maxWiggle = 12;
@@ -201,7 +266,6 @@ export default function WindFlag({ current }) {
     });
   }, [perSegmentErect, firstHangingIndex, segments, time]);
 
-  // Segment render chain
   const segmentRenderData = useMemo(() => {
     const data = [];
     let cursorX = 0;
@@ -233,7 +297,6 @@ export default function WindFlag({ current }) {
     return data;
   }, [angles, perSegmentErect, initialHeight, taper, segLength, colors, segments]);
 
-  // Ripple parameters (stable)
   const rippleParamsRef = useRef(
     Array.from({ length: segments }, () => ({
       waveCount: 0.6 * (0.9 + Math.random() * 0.2),
@@ -243,7 +306,6 @@ export default function WindFlag({ current }) {
     }))
   );
 
-  // Rippled polygon generator
   const makeRippledPolygon = useCallback(
     (startW, endW, length, erectRatio, segmentIndex) => {
       const subdivisions = 4;
@@ -287,6 +349,7 @@ export default function WindFlag({ current }) {
     let height = 0;
     let rafId;
     let particles = [];
+    let lastFrame = performance.now();
 
     const resize = () => {
       const rect = canvas.parentElement.getBoundingClientRect();
@@ -311,47 +374,43 @@ export default function WindFlag({ current }) {
       };
     };
 
-    const animate = (now) => {
-      let lastFrame = now;
-      const step = (t) => {
-        const dt = (t - lastFrame) / 1000;
-        lastFrame = t;
+    const step = (t) => {
+      const dt = (t - lastFrame) / 1000;
+      lastFrame = t;
 
-        const normalizedWindInside = Math.min(smoothedKnotsRef.current, 15) / 15;
-        const targetCount = Math.round(lerp(8, 40, normalizedWindInside));
-        while (particles.length < targetCount) {
-          particles.push(createParticle());
+      const normalizedWindInside = Math.min(smoothedKnotsRef.current, 15) / 15;
+      const targetCount = Math.round(lerp(8, 40, normalizedWindInside));
+      while (particles.length < targetCount) {
+        particles.push(createParticle());
+      }
+      if (particles.length > targetCount) {
+        particles = particles.slice(0, targetCount);
+      }
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.lineWidth = 1;
+
+      particles.forEach((p, idx) => {
+        p.x += p.speed * dt;
+        p.y += Math.sin(t * 2 + p.offsetPhase) * 2 * dt + p.drift * dt;
+
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + p.length, p.y);
+        ctx.strokeStyle = `rgba(255,255,255,${p.alpha * normalizedWindInside})`;
+        ctx.stroke();
+
+        if (p.x - p.length > width) {
+          const newP = createParticle();
+          newP.x = -newP.length;
+          particles[idx] = newP;
         }
-        if (particles.length > targetCount) {
-          particles = particles.slice(0, targetCount);
-        }
+      });
 
-        ctx.clearRect(0, 0, width, height);
-        ctx.lineWidth = 1;
-
-        particles.forEach((p, idx) => {
-          p.x += p.speed * dt;
-          p.y += Math.sin(t * 2 + p.offsetPhase) * 2 * dt + p.drift * dt;
-
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p.x + p.length, p.y);
-          ctx.strokeStyle = `rgba(255,255,255,${p.alpha * normalizedWindInside})`;
-          ctx.stroke();
-
-          if (p.x - p.length > width) {
-            const newP = createParticle();
-            newP.x = -newP.length;
-            particles[idx] = newP;
-          }
-        });
-
-        rafId = requestAnimationFrame(step);
-      };
       rafId = requestAnimationFrame(step);
     };
 
-    rafId = requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(step);
     return () => {
       cancelAnimationFrame(rafId);
       ro.disconnect();
@@ -362,6 +421,8 @@ export default function WindFlag({ current }) {
     const currentIndex = units.indexOf(selectedUnit);
     setSelectedUnit(units[(currentIndex + 1) % units.length]);
   };
+
+  const avgKnots = avg ?? demoAvgKnots;
 
   return (
     <div
@@ -391,39 +452,57 @@ export default function WindFlag({ current }) {
           </h4>
         </div>
       </div>
-      <svg
-        width="200"
-        height="220"
-        viewBox="0 0 250 300"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {/* Pole */}
-        <rect x="10" y="10" width="5" height="275" fill="gray" />
-        {/* Flag */}
-        <g transform="translate(15, 30)">
-          {segmentRenderData.map((sec) => {
-            const points = makeRippledPolygon(
-              sec.startWidth,
-              sec.endWidth,
-              sec.length,
-              sec.erectRatio,
-              sec.key
-            );
-            return (
-              <g
-                key={sec.key}
-                transform={`translate(${sec.x}, ${sec.y}) rotate(${sec.angle})`}
-                style={{ transformOrigin: '100 0' }}
-              >
-                <polygon points={points} fill={sec.color} />
-              </g>
-            );
-          })}
-        </g>
-      </svg>
-      <p className="mt-4 text-base font-semibold text-white">
-        {t('windStrengthDesc')} {displayedSpeed} {unitLabels[selectedUnit]}
-      </p>
+
+      <div className="flex items-start gap-4 flex-wrap min-w-0 md:pl-[100px] pl-4">
+        <svg
+          width="200"
+          height="220"
+          viewBox="0 0 250 300"
+          preserveAspectRatio="xMidYMid meet"
+          className="flex-shrink-0"
+        >
+          <rect x="10" y="10" width="5" height="275" fill="gray" />
+          <g transform="translate(15, 30)">
+            {segmentRenderData.map((sec) => {
+              const points = makeRippledPolygon(
+                sec.startWidth,
+                sec.endWidth,
+                sec.length,
+                sec.erectRatio,
+                sec.key
+              );
+              return (
+                <g
+                  key={sec.key}
+                  transform={`translate(${sec.x}, ${sec.y}) rotate(${sec.angle})`}
+                  style={{ transformOrigin: '100 0' }}
+                >
+                  <polygon points={points} fill={sec.color} />
+                </g>
+              );
+            })}
+          </g>
+        </svg>
+
+        <div className="flex flex-row flex-shrink-0" style={{ gap: 25 }}>
+          <VerticalBar
+            valueKnots={knots}
+            selectedUnit={selectedUnit}
+            max={15}
+            label="Windspeed (current)"
+            // barBackground="rgba(220, 240, 255, 1)"
+            // fillColor="#4faaf7"
+          />
+          <VerticalBar
+            valueKnots={avgKnots}
+            selectedUnit={selectedUnit}
+            max={15}
+            label="Windspeed (60s avg)"
+            // barBackground="rgba(220, 240, 255, 1)"
+            // fillColor="#4681b5ff"
+          />
+        </div>
+      </div>
     </div>
   );
 }

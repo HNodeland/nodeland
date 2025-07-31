@@ -136,6 +136,7 @@ export default function Weather() {
           direction={data.wind_dir}
         />
         <WindFlag current={data.current_windspeed} />
+        {/* <WindFlag /> */}
       </div>
 
       {/* SunClock & RainGauge row */}
