@@ -85,7 +85,7 @@ export default function RainGauge({
   return (
     <div className="w-full px-4 relative cursor-pointer" onClick={toggleUnit}>
       <div 
-        className="absolute top-[-4px] left-2 w-8 h-8 rounded-full bg-brand-mid text-white flex items-center justify-center text-base font-bold"
+        className="absolute top-[-4px] left-2 w-10 h-10 rounded-full bg-brand-mid text-white flex items-center justify-center text-base font-bold"
       >
         {unit}
       </div>

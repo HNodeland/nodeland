@@ -1,10 +1,10 @@
+// client\src\Weather.jsx
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SunCalc from 'suncalc'
 
 import TemperatureGauge from './components/TemperatureGauge'
 import Compass          from './components/Compass'
-import VerticalBars     from './components/VerticalBars'
 import SunClock         from './components/SunClock'
 import RainGauge        from './components/RainGauge'
 import RainChart        from './components/RainChart'
@@ -16,6 +16,7 @@ import DailyWindChart   from './components/DailyWindChart'
 import DailyRainChart   from './components/DailyRainChart'
 import DailyPressureChart from './components/DailyPressureChart'
 import UpdateIndicator  from './components/UpdateIndicator'
+import WindFlag         from './components/WindFlag'
 
 // NOAA Wind Chill Index
 function windChill(T, vKmh) {
@@ -134,12 +135,7 @@ export default function Weather() {
           average={data.avg_wind_10min}  // Updated to use avg_wind_10min (was windAvg)
           direction={data.wind_dir}
         />
-        <VerticalBars data={{
-          windCurrent: data.current_windspeed,
-          windAvg:     data.avg_wind_10min,  // Updated
-          uvIndex:     data.uv_index,
-          solarReading:data.vp_solar_wm2
-        }} />
+        <WindFlag  />
       </div>
 
       {/* SunClock & RainGauge row */}

@@ -37,6 +37,10 @@ const resources = {
       // Compass header
       windDirection: 'Wind Direction',
 
+      // Flag
+      windStrengthTitle: 'Wind Strength',
+      windStrengthDesc: 'Current Wind Strength: ',
+
       // Temperature Gauge
       temperatureGauge: {
         title: 'Temperature Scale (°C)',
@@ -169,6 +173,10 @@ const resources = {
 
       // Compass header
       windDirection: 'Vindretning',
+
+      // Flag
+      windStrengthTitle: 'Vindstyrke',
+      windStrengthDesc: 'Vindstyrken nå: ',
 
       // Temperatur
       temperatureGauge: {

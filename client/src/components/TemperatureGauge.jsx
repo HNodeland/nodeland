@@ -70,7 +70,7 @@ export default function TemperatureGauge({
           {t('temperatureGauge.title').slice(0, -4)} (°{unit})
         </h4>
         <div 
-          className="absolute left-0 w-8 h-8 rounded-full bg-brand-mid text-white flex items-center justify-center text-lg font-bold"
+          className="absolute left-0 w-10 h-10 rounded-full bg-brand-mid text-white flex items-center justify-center text-lg font-bold"
         >
           °{unit}
         </div>
