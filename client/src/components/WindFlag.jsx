@@ -28,7 +28,7 @@ function VerticalBar({
 
   return (
     <div
-      className="relative flex flex-col items-center text-white"
+      className="relative flex flex-col items-center text-white flex-shrink-0"
       style={{ width: width, height: 220 }}
       aria-label={`${label}: ${displayValue}`}
     >
@@ -49,7 +49,7 @@ function VerticalBar({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: 600,
             position: 'relative',
             borderRadius: 6,
@@ -78,6 +78,23 @@ function VerticalBar({
 export default function WindFlag({ current, avg }) {
   const { t } = useTranslation();
   const [selectedUnit, setSelectedUnit] = useState('kts');
+  const rootRef = useRef(null);
+  const [scale, setScale] = useState(1);
+  const BASE_LAYOUT_WIDTH = 375; // flag (200) + two bars (75*2) + gap (25)
+
+  // Responsive scaling based on available width
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const e of entries) {
+        const w = e.contentRect.width;
+        const newScale = Math.min(1, w / BASE_LAYOUT_WIDTH);
+        setScale(newScale);
+      }
+    });
+    observer.observe(rootRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   // Demo fallback if no current provided
   const [demoKnots, setDemoKnots] = useState(1);
@@ -112,15 +129,16 @@ export default function WindFlag({ current, avg }) {
 
   // Flag parameters
   const segments = 5;
-  const initialHeight = 40;
+  const initialHeight = 30;
   const taper = initialHeight / segments;
   const segLength = 40;
   const colors = ['red', 'white', 'red', 'white', 'red'];
 
+  // Adjusted for lower frequency / higher amplitude overall
   const maxDelay = 0.35;
   const minDelay = 0.08;
-  const baseFreq = 0.9;
-  const maxFreq = 2.0;
+  const baseFreq = 0.6; // lowered base frequency
+  const maxFreq = 1.5; // lowered max frequency
 
   const smoothRef = useRef(Math.min(1 / 3, segments));
   const [smoothErectProgress, setSmoothErectProgress] = useState(smoothRef.current);
@@ -242,15 +260,30 @@ export default function WindFlag({ current, avg }) {
       let baseAngle = (1 - erectRatio) * 90;
 
       if (erectRatio < 1) {
+        // hanging/vertical section gets extra sway at low wind
         let hangFactor = 1 - erectRatio;
-        if (erectRatio < 0.05) hangFactor = 0;
+        if (erectRatio < 0.05) hangFactor = 0; // dead zone
 
-        const maxWiggle = 12;
-        const wiggleAmp = maxWiggle * smoothedWindInfluenceRef.current * hangFactor;
+        const maxWiggle = 18; // increased amplitude
+
+        // base smoothed wind influence (small at low wind)
+        const baseInfluence = smoothedWindInfluenceRef.current;
+
+        // stronger low-wind boost to make triple propagation visible early
+        const lowWindBoost = (1 - normalizedWind) * 0.8; // up to 0.8 when wind is near zero
+        const extraInfluence = lowWindBoost * hangFactor;
+
+        const combinedInfluence = baseInfluence + extraInfluence;
+
+        // effective frequency slightly reduced at low wind for slower sway
+        const effectiveFreq =
+          smoothedFreqRef.current * (0.7 + 0.3 * normalizedWind); // 0.7x at zero wind, up to 1x
+
+        const wiggleAmp = maxWiggle * combinedInfluence * hangFactor;
 
         const propagationIndex = Math.max(0, i - firstHangingIndex);
         const phaseDelay =
-          smoothedFreqRef.current *
+          effectiveFreq *
           smoothedTravelDelayRef.current *
           propagationIndex *
           2 *
@@ -264,7 +297,7 @@ export default function WindFlag({ current, avg }) {
 
       return baseAngle;
     });
-  }, [perSegmentErect, firstHangingIndex, segments, time]);
+  }, [perSegmentErect, firstHangingIndex, segments, time, normalizedWind]);
 
   const segmentRenderData = useMemo(() => {
     const data = [];
@@ -426,6 +459,7 @@ export default function WindFlag({ current, avg }) {
 
   return (
     <div
+      ref={rootRef}
       className="relative bg-brand-deep rounded-lg shadow-md p-4 flex flex-col items-center justify-center cursor-pointer h-[300px]"
       onClick={toggleUnit}
     >
@@ -453,54 +487,61 @@ export default function WindFlag({ current, avg }) {
         </div>
       </div>
 
-      <div className="flex items-start gap-4 flex-wrap min-w-0 md:pl-[100px] pl-4">
-        <svg
-          width="200"
-          height="220"
-          viewBox="0 0 250 300"
-          preserveAspectRatio="xMidYMid meet"
-          className="flex-shrink-0"
+      <div className="flex items-start gap-4 flex-nowrap min-w-0 md:pl-[100px] pl-4">
+        <div
+          style={{
+            width: BASE_LAYOUT_WIDTH,
+            transform: `scale(${scale})`,
+            transformOrigin: 'left top',
+            display: 'flex',
+            gap: 25,
+          }}
         >
-          <rect x="10" y="10" width="5" height="275" fill="gray" />
-          <g transform="translate(15, 30)">
-            {segmentRenderData.map((sec) => {
-              const points = makeRippledPolygon(
-                sec.startWidth,
-                sec.endWidth,
-                sec.length,
-                sec.erectRatio,
-                sec.key
-              );
-              return (
-                <g
-                  key={sec.key}
-                  transform={`translate(${sec.x}, ${sec.y}) rotate(${sec.angle})`}
-                  style={{ transformOrigin: '100 0' }}
-                >
-                  <polygon points={points} fill={sec.color} />
-                </g>
-              );
-            })}
-          </g>
-        </svg>
+          <svg
+            width="200"
+            height="190"
+            viewBox="0 0 250 300"
+            preserveAspectRatio="xMidYMid meet"
+            className="flex-shrink-0"
+            style={{ marginLeft: 10 }}
+          >
+            <rect x="10" y="0" width="5" height="290" fill="gray" />
+            <g transform="translate(15, 30)">
+              {segmentRenderData.map((sec) => {
+                const points = makeRippledPolygon(
+                  sec.startWidth + 15,
+                  sec.endWidth + 15,
+                  sec.length,
+                  sec.erectRatio,
+                  sec.key
+                );
+                return (
+                  <g
+                    key={sec.key}
+                    transform={`translate(${sec.x}, ${sec.y}) rotate(${sec.angle})`}
+                    style={{ transformOrigin: '100 0' }}
+                  >
+                    <polygon points={points} fill={sec.color} />
+                  </g>
+                );
+              })}
+            </g>
+          </svg>
 
-        <div className="flex flex-row flex-shrink-0" style={{ gap: 25 }}>
-          <VerticalBar
-            valueKnots={knots}
-            selectedUnit={selectedUnit}
-            max={15}
-            label="Windspeed (current)"
-            // barBackground="rgba(220, 240, 255, 1)"
-            // fillColor="#4faaf7"
-          />
-          <VerticalBar
-            valueKnots={avgKnots}
-            selectedUnit={selectedUnit}
-            max={15}
-            label="Windspeed (60s avg)"
-            // barBackground="rgba(220, 240, 255, 1)"
-            // fillColor="#4681b5ff"
-          />
+          <div className="flex flex-row flex-shrink-0" style={{ gap: 25 }}>
+            <VerticalBar
+              valueKnots={knots}
+              selectedUnit={selectedUnit}
+              max={15}
+              label="Windspeed (current)"
+            />
+            <VerticalBar
+              valueKnots={avgKnots}
+              selectedUnit={selectedUnit}
+              max={15}
+              label="Windspeed (60s avg)"
+            />
+          </div>
         </div>
       </div>
     </div>
