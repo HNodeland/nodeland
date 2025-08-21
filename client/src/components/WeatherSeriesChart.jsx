@@ -4,6 +4,25 @@ import {
 } from 'recharts';
 
 // ───────────────────────────── helpers ─────────────────────────────
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function ordinalSuffix(n) {
+  const v = n % 100;
+  if (v >= 11 && v <= 13) return 'th';
+  switch (n % 10) { case 1: return 'st'; case 2: return 'nd'; case 3: return 'rd'; default: return 'th'; }
+}
+function formatOrdinalDate(ts) {
+  const d = new Date(ts);
+  const m = MONTHS[d.getMonth()];
+  const day = d.getDate();
+  return `${m} ${day}${ordinalSuffix(day)}`;
+}
+function startOfLocalDay(ts) {
+  const d = new Date(ts);
+  d.setHours(0,0,0,0);
+  return d.getTime();
+}
+const DAY_RANGES = new Set(['7','30','90','180','365']);
+
 const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString([], { year: 'numeric', month: 'short', day: '2-digit' });
@@ -32,25 +51,57 @@ function roundVal(v, unit) {
   return `${Number(v).toFixed(1)}${unit ?? ''}`;
 }
 
+// Build ticks that look good per range
 function buildTicksForRange(data, rangeKey) {
   if (!data?.length) return [];
+  // Today → time-of-day ticks sampled ~6 times
+  if (rangeKey === 'today') {
+    const n = data.length;
+    const step = Math.max(1, Math.floor(n / 6));
+    return data.filter((_, i) => i % step === 0).map(d => d.__x);
+  }
+
+  // Day-based ranges → one tick per distinct local day (downsampled to ~7 ticks)
+  if (DAY_RANGES.has(rangeKey)) {
+    const days = [];
+    let last = null;
+    for (const d of data) {
+      const sod = startOfLocalDay(d.__x);
+      if (sod !== last) { days.push(sod); last = sod; }
+    }
+    const target = 7;
+    const step = Math.max(1, Math.ceil(days.length / target));
+    return days.filter((_, i) => i % step === 0);
+  }
+
+  // Multi-year & all → spread evenly; month/year formatting handles labels
   const xs = data.map(d => d.__x);
-  const min = Math.min(...xs);
-  const max = Math.max(...xs);
-  const target =
-    rangeKey === 'today' ? 6 :
-    (rangeKey === '730' || rangeKey === '1825' || rangeKey === '3650' || rangeKey === 'all') ? 8 :
-    7;
+  const min = Math.min(...xs), max = Math.max(...xs);
+  const target = 8;
   if (max <= min) return [min];
   const step = (max - min) / (target - 1);
   return Array.from({ length: target }, (_, i) => Math.round(min + i * step));
 }
 
-const yTick = (unit) => (v) => {
+// Keep Y ticks short (numbers only). Unit is placed on the axis label.
+const yTickNumber = (v) => {
   if (!Number.isFinite(v)) return '';
-  const n = Math.abs(v) < 1e-8 ? 0 : v; // avoid "-0.0"
-  return `${n.toFixed(1)}${unit ?? ''}`;
+  const n = Math.abs(v) < 1e-8 ? 0 : v;
+  return n.toFixed(1);
 };
+
+function axisLabelFor(type) {
+  switch (type) {
+    case 'temp':     return '°C';
+    case 'wind':     return 'm/s';
+    case 'rain':     return 'mm';
+    case 'pressure': return 'hPa';
+    default:         return '';
+  }
+}
+function yAxisWidthFor(type) {
+  return type === 'pressure' ? 74 : 56;
+}
 
 // ────────────────────── Robust smoothing (median + clipped Gaussian) ─────────────────────
 function isNearlyConstant(arr, eps = 1e-4) {
@@ -285,10 +336,10 @@ function extentForKeys(data, keys) {
 
 /**
  * Custom Y domain per type:
- * temp:    default [-10, +10] centered at 0; expand symmetrically if data exceed ±10
- * wind:    default [0, 10];     expand upward if data exceed 10
- * rain:    default [0, 10];     expand upward if data exceed 10
- * pressure: default [1008.0, 1009.0]; expand downward/upward to include data
+ * temp:    default [-10, +10]; expand only the side that exceeds the band
+ * wind:    default [0, 10];    expand upward if data exceed 10
+ * rain:    default [0, 10];    expand upward if data exceed 10
+ * pressure: default [1008.0, 1009.0]; expand to include data
  */
 function yDomainFor(type, data, keys) {
   const ext = extentForKeys(data, keys);
@@ -425,9 +476,14 @@ export default function WeatherSeriesChart({ type }) {
     if (range === 'today') {
       return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
+    if (DAY_RANGES.has(range)) {
+      return formatOrdinalDate(ts);            // "Aug 20th"
+    }
+    // 2y/5y/10y/all → compact month-year
     if (range === '730' || range === '1825' || range === '3650' || range === 'all') {
       return new Date(ts).toLocaleDateString([], { year: 'numeric', month: 'short' });
     }
+    // Fallback
     return relativeLabel(ts, nowTs);
   };
 
@@ -439,10 +495,9 @@ export default function WeatherSeriesChart({ type }) {
   const labelFormatter = (ts) => (range === 'today' ? fmtDateTime(ts) : fmtDate(ts));
   const header = `${CONFIG[type].title} (${range === 'today' ? 'Today' : RANGES.find(r => r.key === range)?.label})`;
 
-  // ── NEW: domain per type
+  // Y-domain per type
   const yKeys = range === 'today' ? [CONFIG[type].todayKey] : CONFIG[type].daily.series.map(s => s.key);
   const yDomain = yDomainFor(type, data, yKeys);
-  const yTickFormatter = yTick(CONFIG[type].unit);
 
   // Draw dots only when we have fewer than 50 points
   const SHOW_DOT_THRESHOLD = 50;
@@ -456,37 +511,37 @@ export default function WeatherSeriesChart({ type }) {
 
   return (
     <div className="w-full bg-brand-deep p-4 rounded-lg shadow-md overflow-hidden">
-    {/* header row that wraps gracefully */}
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 min-w-0">
+      {/* header row that wraps gracefully */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 min-w-0">
         <h2 className="text-base sm:text-lg font-semibold truncate">
-        {header}
+          {header}
         </h2>
 
         <div className="flex flex-wrap items-center gap-2 min-w-0">
-        <label className="text-xs sm:text-sm opacity-80 whitespace-nowrap">Smoothing</label>
-        <select
+          <label className="text-xs sm:text-sm opacity-80 whitespace-nowrap">Smoothing</label>
+          <select
             value={smoothLevel}
             onChange={(e) => setSmoothLevel(e.target.value)}
             className="bg-brand-mid text-white px-2 py-1 rounded text-xs sm:text-sm max-w-full"
-        >
+          >
             <option value="off">Off</option>
             <option value="low">Low</option>
             <option value="auto">Auto</option>
             <option value="med">Med</option>
             <option value="high">High</option>
-        </select>
+          </select>
 
-        <select
+          <select
             value={range}
             onChange={(e) => setRange(e.target.value)}
             className="bg-brand-mid text-white px-2 py-1 rounded text-xs sm:text-sm max-w-full"
-        >
+          >
             {RANGES.map((r) => (
-            <option key={r.key} value={r.key}>{r.label}</option>
+              <option key={r.key} value={r.key}>{r.label}</option>
             ))}
-        </select>
+          </select>
         </div>
-    </div>
+      </div>
 
       <ResponsiveContainer width="100%" height={260}>
         <LineChart data={data} margin={{ left: 16, right: 12, top: 8, bottom: 28 }}>
@@ -496,6 +551,7 @@ export default function WeatherSeriesChart({ type }) {
             type="number"
             domain={['dataMin', 'dataMax']}
             ticks={ticks}
+            interval="preserveStartEnd"
             tickFormatter={xTickFormatter}
             minTickGap={40}
             tick={{ fill: '#fff' }}
@@ -504,12 +560,19 @@ export default function WeatherSeriesChart({ type }) {
           />
           <YAxis
             domain={yDomain}
-            tickFormatter={yTickFormatter}
-            tick={{ fill: '#fff' }}
+            tickFormatter={yTickNumber}                 // numbers only; unit moved to axis label
+            tick={{ fill: '#fff', fontSize: 12 }}
             tickLine={false}
             tickMargin={10}
-            width={80}
+            width={yAxisWidthFor(type)}                // type-specific width (pressure needs more)
             allowDecimals
+            label={{
+              value: axisLabelFor(type),               // unit here
+              angle: -90,
+              position: 'left',
+              style: { fill: '#fff', opacity: 0.8, fontSize: 12 },
+              offset: 0,
+            }}
           />
           <Tooltip
             labelFormatter={labelFormatter}
