@@ -34,8 +34,16 @@ app.use('/api/health', healthRoutes);
 const buildPath = path.join(process.cwd(), 'public');
 app.use(express.static(buildPath));
 
+// cache hashed assets aggressively
+app.use('/assets', express.static(buildPath + '/assets', {
+  immutable: true,
+  maxAge: '1y',
+}));
+
+
 // ── 3) SPA fallback ─────────────────────────────────────────────────────────
 app.get('*', (_req, res) => {
+  res.set('Cache-Control', 'no-cache');
   res.sendFile(path.join(buildPath, 'index.html'));
 });
 
