@@ -6,17 +6,11 @@ import SunCalc from 'suncalc'
 import TemperatureGauge from './components/TemperatureGauge'
 import Compass          from './components/Compass'
 import SunClock         from './components/SunClock'
-import RainGauge        from './components/RainGauge'
-import RainChart        from './components/RainChart'
-import WindChart        from './components/WindChart'
-import TempChart        from './components/TempChart'
-import PressureChart    from './components/PressureChart'
-import DailyTempChart   from './components/DailyTempChart'
-import DailyWindChart   from './components/DailyWindChart'
-import DailyRainChart   from './components/DailyRainChart'
-import DailyPressureChart from './components/DailyPressureChart'
+import WeatherSeriesChart from './components/WeatherSeriesChart'
 import UpdateIndicator  from './components/UpdateIndicator'
 import WindFlag         from './components/WindFlag'
+import RainGauge from './components/RainGauge'
+
 
 // NOAA Wind Chill Index
 function windChill(T, vKmh) {
@@ -160,20 +154,12 @@ export default function Weather() {
         <div />
       </div>
 
-      {/* Historical Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <RainChart />
-        <WindChart />
-        <TempChart />
-        <PressureChart />
-      </div>
 
-      {/* Daily Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-        <DailyTempChart />
-        <DailyWindChart />
-        <DailyRainChart />
-        <DailyPressureChart />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <WeatherSeriesChart type="temp" />
+        <WeatherSeriesChart type="wind" />
+        <WeatherSeriesChart type="rain" />
+        <WeatherSeriesChart type="pressure" />
       </div>
     </div>
   )

@@ -47,7 +47,8 @@ BEGIN
     `max_vp_solar_wm2`,
     `max_cloud_height`,
     `max_leaf_wetness_vp`,
-    `max_soil_moisture_vp`
+    `max_soil_moisture_vp`,
+    `max_day_rain`
   ) SELECT
     yesterday,
     COALESCE(MAX(out_temp), 0),
@@ -89,7 +90,8 @@ BEGIN
     COALESCE(MAX(vp_solar_wm2), 0),
     COALESCE(MAX(cloud_height), 0),
     COALESCE(MAX(leaf_wetness_vp), 0),
-    COALESCE(MAX(soil_moisture_vp), 0)
+    COALESCE(MAX(soil_moisture_vp), 0),
+    COALESCE(MAX(day_rain), 0)
   FROM weather_readings
   WHERE DATE(FROM_UNIXTIME(ts/1000)) = yesterday
   ON DUPLICATE KEY UPDATE
@@ -132,7 +134,8 @@ BEGIN
     max_vp_solar_wm2 = VALUES(max_vp_solar_wm2),
     max_cloud_height = VALUES(max_cloud_height),
     max_leaf_wetness_vp = VALUES(max_leaf_wetness_vp),
-    max_soil_moisture_vp = VALUES(max_soil_moisture_vp);
+    max_soil_moisture_vp = VALUES(max_soil_moisture_vp),
+    max_day_rain = VALUES(max_day_rain);
 
   -- Insert min values
   INSERT INTO weather_daily_min (
@@ -176,7 +179,8 @@ BEGIN
     `min_vp_solar_wm2`,
     `min_cloud_height`,
     `min_leaf_wetness_vp`,
-    `min_soil_moisture_vp`
+    `min_soil_moisture_vp`,
+    `min_day_rain`
   ) SELECT
     yesterday,
     COALESCE(MIN(out_temp), 0),
@@ -218,7 +222,8 @@ BEGIN
     COALESCE(MIN(vp_solar_wm2), 0),
     COALESCE(MIN(cloud_height), 0),
     COALESCE(MIN(leaf_wetness_vp), 0),
-    COALESCE(MIN(soil_moisture_vp), 0)
+    COALESCE(MIN(soil_moisture_vp), 0),
+    COALESCE(MIN(day_rain), 0)
   FROM weather_readings
   WHERE DATE(FROM_UNIXTIME(ts/1000)) = yesterday
   ON DUPLICATE KEY UPDATE
@@ -261,7 +266,8 @@ BEGIN
     min_vp_solar_wm2 = VALUES(min_vp_solar_wm2),
     min_cloud_height = VALUES(min_cloud_height),
     min_leaf_wetness_vp = VALUES(min_leaf_wetness_vp),
-    min_soil_moisture_vp = VALUES(min_soil_moisture_vp);
+    min_soil_moisture_vp = VALUES(min_soil_moisture_vp),
+    min_day_rain = VALUES(min_day_rain);
 
   -- Insert avg values
   INSERT INTO weather_daily_avg (
@@ -305,7 +311,8 @@ BEGIN
     `avg_vp_solar_wm2`,
     `avg_cloud_height`,
     `avg_leaf_wetness_vp`,
-    `avg_soil_moisture_vp`
+    `avg_soil_moisture_vp`,
+    `avg_day_rain`
   ) SELECT
     yesterday,
     COALESCE(AVG(out_temp), 0),
@@ -347,7 +354,8 @@ BEGIN
     COALESCE(AVG(vp_solar_wm2), 0),
     COALESCE(AVG(cloud_height), 0),
     COALESCE(AVG(leaf_wetness_vp), 0),
-    COALESCE(AVG(soil_moisture_vp), 0)
+    COALESCE(AVG(soil_moisture_vp), 0),
+    COALESCE(AVG(day_rain), 0)
   FROM weather_readings
   WHERE DATE(FROM_UNIXTIME(ts/1000)) = yesterday
   ON DUPLICATE KEY UPDATE
@@ -390,7 +398,8 @@ BEGIN
     avg_vp_solar_wm2 = VALUES(avg_vp_solar_wm2),
     avg_cloud_height = VALUES(avg_cloud_height),
     avg_leaf_wetness_vp = VALUES(avg_leaf_wetness_vp),
-    avg_soil_moisture_vp = VALUES(avg_soil_moisture_vp);
+    avg_soil_moisture_vp = VALUES(avg_soil_moisture_vp),
+    avg_day_rain = VALUES(avg_day_rain);
 
   -- Wipe old readings
   DELETE FROM weather_readings

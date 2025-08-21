@@ -41,5 +41,6 @@ CREATE TABLE IF NOT EXISTS weather_daily_avg (
   `avg_cloud_height` FLOAT,
   `avg_leaf_wetness_vp` FLOAT,
   `avg_soil_moisture_vp` FLOAT,
+  `avg_day_rain` FLOAT,
   `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

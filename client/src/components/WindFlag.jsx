@@ -67,6 +67,7 @@ function VerticalBar({
               pointerEvents: 'none',
               textAlign: 'center',
               whiteSpace: 'nowrap',
+              transform: 'translateY(-10px)',
             }}
           >
             {displayValue}

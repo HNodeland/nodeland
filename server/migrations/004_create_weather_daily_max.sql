@@ -41,5 +41,6 @@ CREATE TABLE IF NOT EXISTS weather_daily_max (
   `max_cloud_height` FLOAT,
   `max_leaf_wetness_vp` FLOAT,
   `max_soil_moisture_vp` FLOAT,
+  `max_day_rain` FLOAT,
   `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
