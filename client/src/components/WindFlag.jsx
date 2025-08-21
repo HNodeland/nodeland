@@ -28,9 +28,13 @@ function VerticalBar({
 
   return (
     <div
-      className="relative flex flex-col items-center text-white flex-shrink-0"
-      style={{ width: width, height: 220 }}
-      aria-label={`${label}: ${displayValue}`}
+      className="relative flex-none flex flex-col items-center text-white"
+      style={{
+        width: 'clamp(56px, 20vw, 75px)',
+        minWidth: 56,
+        height: 200,
+        flexShrink: 0,
+      }}
     >
       <div className="relative flex-1 w-full rounded-md overflow-hidden flex flex-col justify-end">
         <div
@@ -62,6 +66,7 @@ function VerticalBar({
               lineHeight: 1,
               pointerEvents: 'none',
               textAlign: 'center',
+              whiteSpace: 'nowrap',
             }}
           >
             {displayValue}
@@ -80,7 +85,10 @@ export default function WindFlag({ current, avg }) {
   const [selectedUnit, setSelectedUnit] = useState('kts');
   const rootRef = useRef(null);
   const [scale, setScale] = useState(1);
-  const BASE_LAYOUT_WIDTH = 375; // flag (200) + two bars (75*2) + gap (25)
+
+  // Base layout metrics (unscaled)
+  const BASE_LAYOUT_WIDTH = 375; // flag (200) + two bars (75*2) + gap (~24) + svg left margin (≈10)
+  const BASE_LAYOUT_HEIGHT = 220; // max of bars (220) vs flag (190)
 
   // Responsive scaling based on available width
   useEffect(() => {
@@ -487,23 +495,28 @@ export default function WindFlag({ current, avg }) {
         </div>
       </div>
 
-      <div className="flex items-start gap-4 flex-nowrap min-w-0 md:pl-[100px] pl-4">
+      {/* SCALE BOX: reserves scaled footprint so content never escapes */}
+      <div
+        style={{
+          width: (BASE_LAYOUT_WIDTH+40) * scale,
+          height: (BASE_LAYOUT_HEIGHT) * scale,
+          overflow: 'hidden',
+        }}
+      >
         <div
+          className="flex items-start gap-6"
           style={{
             width: BASE_LAYOUT_WIDTH,
+            height: BASE_LAYOUT_HEIGHT,
             transform: `scale(${scale})`,
-            transformOrigin: 'left top',
-            display: 'flex',
-            gap: 25,
+            transformOrigin: 'top left',
           }}
         >
           <svg
-            width="200"
-            height="190"
             viewBox="0 0 250 300"
             preserveAspectRatio="xMidYMid meet"
-            className="flex-shrink-0"
-            style={{ marginLeft: 10 }}
+            className="flex-none"
+            style={{ width: 200, height: 190, marginLeft: 10 }}
           >
             <rect x="10" y="0" width="5" height="290" fill="gray" />
             <g transform="translate(15, 30)">
@@ -528,7 +541,7 @@ export default function WindFlag({ current, avg }) {
             </g>
           </svg>
 
-          <div className="flex flex-row flex-shrink-0" style={{ gap: 25 }}>
+          <div className="flex gap-6 flex-1 min-w-0">
             <VerticalBar
               valueKnots={knots}
               selectedUnit={selectedUnit}
